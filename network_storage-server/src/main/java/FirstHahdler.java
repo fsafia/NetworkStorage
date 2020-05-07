@@ -17,6 +17,7 @@ public class FirstHahdler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf buf = (ByteBuf) msg;
         while (buf.readableBytes() > 0) {
+            System.out.println("пришло байт -" + buf.readableBytes());
             if(currentState == State.IDLE) {
                 byte readed = buf.readByte();
                 if (readed == (byte) 1) {   // 1-команда для записи файла на сервер
@@ -32,18 +33,20 @@ public class FirstHahdler extends ChannelInboundHandlerAdapter {
                 if (buf.readableBytes() >= 4) {  // ?????????????почему цыфра 4?
                     System.out.println("STATE: GET filename lenght");
                     nextLenght = buf.readInt();
+                    System.out.println(nextLenght);
                     currentState = State.NAME;
                 }
             }
 
             if (currentState == State.NAME) {
                 if (buf.readableBytes() >=  nextLenght) {
+                    System.out.println("-------------------------");
                     byte [] fileName = new byte[nextLenght];
                     buf.readBytes(fileName);
                     System.out.println("STATE Filename received - _" + new String(fileName, "UTF-8"));
                     currentState = State.FILE_LENGHT;
                     //сама писала//////////////////////////////////
-                    String pathName = "repository" + new String(fileName, "UTF-8");
+                    String pathName = "repository/" + new String(fileName, "UTF-8");
                     newFile = new File(pathName);
                     newFile.mkdirs();
                     out = new FileOutputStream(pathName, true);
