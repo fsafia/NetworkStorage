@@ -9,6 +9,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 public class ServerNetty {
     public void run()  throws Exception {   /////////////////////////throws Exception??????????????????????????????????7
+        Proto proto = new Proto();
         // пул потоков для обработки подключенией клиентов
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         // пул потоков для обработки сетевых подключений

@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class FirstHahdler extends ChannelInboundHandlerAdapter {
@@ -16,15 +17,18 @@ public class FirstHahdler extends ChannelInboundHandlerAdapter {
     private long receivedFileLenght;
     private FileOutputStream out ;
     private Path newFile;
+    private byte readed;
+    ArrayList<Path> renameFile;
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf buf = (ByteBuf) msg;
         while (buf.readableBytes() > 0) {
             if(currentState == State.IDLE) {
-                byte readed = buf.readByte();
-                if (readed == (byte) 1) {   // 1-команда для записи файла на сервер
-                    currentState = State.NAME_LENGHT;
-                    receivedFileLenght = 0L;
+                readed = buf.readByte();
+                if (readed == (byte)1 ||readed == (byte)2 ||readed == (byte)3)  {   // 1-команда для записи файла на сервер
+                    currentState = State.NAME_LENGHT;                               // 2- удаление с сервера
+                    receivedFileLenght = 0L;                                        // 3- переименование
+                    renameFile = new ArrayList<>(2);                   // 4 - cкачивание файла
                     System.out.println("STATE: Start file receiving");
                 } else {
                     System.out.println("другую команду"); /////////////////////////////////////////////
@@ -33,7 +37,7 @@ public class FirstHahdler extends ChannelInboundHandlerAdapter {
 
             if (currentState == State.NAME_LENGHT) {
                 getFileNameLenght(buf);
-//                if (buf.readableBytes() >= 4) {  // ?????????????почему цыфра 4?
+//                if (buf.readableBytes() >= 4) {  // считывает long
 //                    System.out.println("STATE: GET filename lenght");
 //                    nextLenght = buf.readInt();
 //                    currentState = State.NAME;
@@ -41,27 +45,49 @@ public class FirstHahdler extends ChannelInboundHandlerAdapter {
             }
 
             if (currentState == State.NAME) {
-
-                if (buf.readableBytes() >=  nextLenght) {
+                if (buf.readableBytes() >= nextLenght) {
 //                    byte [] fileName = new byte[nextLenght];
 //                    buf.readBytes(fileName);
-                    String fn = getFileName(buf);
-                    createFile(fn);
-//
+                    String fn = getName(buf);
+
+                    Path serverPath = getPathOnServer(fn);
 //                    Path path = Paths.get(fn); // получили Path  в виде network_storage-client/1.txt
 //                    path = path.getFileName(); //получили Path  имя файла 1.txt
-//                    Path s = Paths.get("network_storage-server/repository/" + path.toString());
-//                    if (Files.exists(s)) { //--------------добавить проверку на существование файла и директории
-//                        Files.delete(s);
-//                    }
-//
-//                    newFile = Files.createFile(s);
-//
-//                    System.out.println("STATE Filename received - " + path);
-//                    currentState = State.FILE_LENGHT;
-//
-//                    out = new FileOutputStream(newFile.toString(), true);
-//
+//                    Path serverPath = Paths.get("network_storage-server/repository/" + path.toString());
+
+                    if (readed == 1 ) {
+                        if (Files.exists(serverPath)) { //--------------добавить проверку на существование файла и директории
+                            Files.delete(serverPath);
+                        }
+                        createFile(serverPath);
+                    }
+
+                    if (readed == 2 ) {
+                        Files.delete(serverPath);
+                        resetState();
+                    }
+
+                    if (readed == 3) {  //переименование файла ожидаем команду 3 в виде 3(команда)число(длина стар имиени)1.тхтчисло(длина нового имени)3.тхт(1.тхт в 3.тхт)
+                        renameFile.add(serverPath);                                     //byteIntNameOldIntNameNew
+                        if (renameFile.size() == 1) {  //получили Path , renameFile(0)- это старое имя файла
+                            nextLenght = 0;
+                            currentState = State.NAME_LENGHT;
+                        }
+                        if (renameFile.size() == 2 && Files.exists(renameFile.get(0)) && !Files.exists(renameFile.get(1))) { //получили новый Path , renameFile(1)- это новое имя файла
+                            Files.copy(renameFile.get(0), renameFile.get(1));       //если старый файл существует, а файла с новым именем не существует -- переименовываем
+                            // заменить на Files.move(renameFile.get(0), renameFile.get(1));  - это перемещение с заменой имени
+                            Files.delete(renameFile.get(0));
+                            resetState();
+                        }
+//                        if (!Files.exists(renameFile.get(0))){
+//                            System.out.println("file " + renameFile.get(0).toString() + " not exist ");
+//                        } else if (Files.exists(renameFile.get(1))) {
+//                            System.out.println(renameFile.get(1).toString() + " file already exists " );
+//                        }
+                    }
+                    if (readed == 4) {
+                        ctx.write(serverPath);
+                    }
                 }
             }
 
@@ -95,32 +121,32 @@ public class FirstHahdler extends ChannelInboundHandlerAdapter {
     }
 
     private void getFileNameLenght(ByteBuf buf){
-        if (buf.readableBytes() >= 4) {  // ?????????????почему цыфра 4?
+        if (buf.readableBytes() >= 4) {  // считывает long
             System.out.println("STATE: GET filename lenght");
             nextLenght = buf.readInt();
             currentState = State.NAME;
         }
     }
 
-    private String getFileName(ByteBuf buf) throws Exception {
+    private String getName(ByteBuf buf) throws Exception {
         byte [] fileName = new byte[nextLenght];
         buf.readBytes(fileName);
         String fn = new String(fileName, "UTF-8");
         return fn;
     }
 
-    private void createFile(String fn) throws Exception {
+    private void createFile(Path s) throws Exception {
+        newFile = Files.createFile(s);
+        System.out.println("STATE Filename received - " + s.getFileName());
+        currentState = State.FILE_LENGHT;
+        out = new FileOutputStream(newFile.toString(), true);
+    }
+
+    private Path getPathOnServer(String fn) {
         Path path = Paths.get(fn); // получили Path  в виде network_storage-client/1.txt
         path = path.getFileName(); //получили Path  имя файла 1.txt
         Path s = Paths.get("network_storage-server/repository/" + path.toString());
-        if (Files.exists(s)) { //--------------добавить проверку на существование файла и директории
-            Files.delete(s);
-        }
-
-        newFile = Files.createFile(s);
-        System.out.println("STATE Filename received - " + path);
-        currentState = State.FILE_LENGHT;
-        out = new FileOutputStream(newFile.toString(), true);
+        return s;
     }
 
     private void getFileLenght(ByteBuf buf) {
@@ -139,19 +165,21 @@ public class FirstHahdler extends ChannelInboundHandlerAdapter {
             if (fileLenght == receivedFileLenght) {
                 System.out.println("File received");
                 out.close();
-                reverseState();
+                resetState();
                 break;
             }
         }
     }
 
-    private void reverseState() {
+    private void resetState() {
         currentState = State.IDLE;
         nextLenght = 0;
         fileLenght = 0L;
         receivedFileLenght = 0L;
         FileOutputStream out = null;
         newFile = null;
+        readed = (byte) 0;
+        renameFile = null;
     }
     //    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 //        // т.к. этот хэндлер стоит 1 от сети, то 100%  получит ByteBuf
