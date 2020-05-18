@@ -1,9 +1,15 @@
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
 public class IncomingMessageHandler extends ChannelInboundHandlerAdapter {
+    Protocol protocol = new Protocol("1client-storage/");
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        ByteBuf buf = (ByteBuf) msg;
+        while (buf.readableBytes() > 0) {
+            protocol.executeComand(ctx, buf);
+        }
 
     }
 
@@ -15,9 +21,8 @@ public class IncomingMessageHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        String message = "3.txt";
-        System.out.println("Sending message: " + message);
-        ctx.write(message);
+        System.out.println("client connect");
+        ctx.write("1client-storage/1.txt");
         ctx.flush();
     }
 }

@@ -1,5 +1,4 @@
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
@@ -9,7 +8,6 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 public class ServerNetty {
     public void run()  throws Exception {   /////////////////////////throws Exception??????????????????????????????????7
-        Proto proto = new Proto();
         // пул потоков для обработки подключенией клиентов
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         // пул потоков для обработки сетевых подключений

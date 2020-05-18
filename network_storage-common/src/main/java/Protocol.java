@@ -1,0 +1,174 @@
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.nio.channels.SocketChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+
+public class Protocol {
+
+    public enum State {IDLE, NAME_LENGHT, NAME, FILE_LENGHT, FILE}
+
+    public State currentState = State.IDLE;
+    private int nextLenght;
+    private long fileLenght;
+    private long receivedFileLenght;
+    private BufferedOutputStream out ;
+    private Path newFile;
+    private byte comand;
+    ArrayList<Path> renameFile;
+
+    private SocketChannel socketChannel;
+    private String serverStorage;
+
+    Protocol(String serverStorage) {
+        this.socketChannel = socketChannel;
+        this.serverStorage = serverStorage;
+    }
+
+    public void executeComand(ChannelHandlerContext ctx, ByteBuf buf) throws Exception{
+        while (buf.isReadable()) {
+            if(currentState == State.IDLE) {
+                comand = buf.readByte();
+                if (Comand.WRITE_FILE.getNumberComand() == comand
+                    || Comand.DELETE_FILE_FromServer.getNumberComand() == comand
+                    || Comand.RENAME_FILE_FromServer.getNumberComand() == comand
+                    || Comand.DOWNLOAD_FILE_ToClient.getNumberComand() == comand) {
+                                                                                     // 1-команда для записи файла на сервер
+                    currentState = State.NAME_LENGHT;                               // 2- удаление с сервера
+                    receivedFileLenght = 0L;                                        // 3- переименование
+                    renameFile = new ArrayList<>(2);                   // 4 - cкачивание файла
+                    System.out.println("STATE: Start file receiving");
+                } else {
+                    System.out.println("другую команду"); /////////////////////////////////////////////
+                }
+            }
+
+            if (currentState == State.NAME_LENGHT) {
+                getFileNameLenght(buf);
+            }
+
+            if (currentState == State.NAME) {
+                if (buf.readableBytes() >= nextLenght) {
+                    String name = getName(buf);
+
+                    Path serverPath = getPathOnServer(name);  //Path в виде "1server-storage/1.txt"
+
+                    if (Comand.WRITE_FILE.getNumberComand() == comand ) {
+                        if (Files.exists(serverPath)) { //--------------добавить проверку на существование файла и директории
+                            Files.delete(serverPath);
+                        }
+                        createFile(serverPath);  //создан пустой файл с названием 1.txt
+                    }
+
+                    if (Comand.DELETE_FILE_FromServer.getNumberComand() == comand) {
+                        if (Files.exists(serverPath)) { //--------------добавить проверку на существование файла и директории
+                            Files.delete(serverPath);
+                            System.out.println("Файл " + serverPath + " удален");
+                        } else {
+                            System.out.println("Файл " + serverPath + " нет");
+                        }
+                        resetState();
+                    }
+
+                    if (Comand.RENAME_FILE_FromServer.getNumberComand() == comand ) {  //переименование файла ожидаем команду 3 в виде 3(команда)число(длина стар имиени)1.тхтчисло(длина нового имени)3.тхт(1.тхт в 3.тхт)
+                        renameFile.add(serverPath);                                     //byteIntNameOldIntNameNew
+                        if (renameFile.size() == 1) {  //получили Path , renameFile(0)- это старое имя файла
+                            nextLenght = 0;
+                            currentState = State.NAME_LENGHT;
+                        }
+                        if (renameFile.size() == 2 && Files.exists(renameFile.get(0)) && !Files.exists(renameFile.get(1))) { //получили новый Path , renameFile(1)- это новое имя файла
+                            Files.move(renameFile.get(0), renameFile.get(1));       //если старый файл существует, а файла с новым именем не существует -- переименовываем
+                            // заменить на Files.move(renameFile.get(0), renameFile.get(1));  - это перемещение с заменой имени
+                            resetState();
+                        }
+                    }
+                    if (Comand.DOWNLOAD_FILE_ToClient.getNumberComand() == comand) {
+                        ctx.write(serverPath);
+                        resetState();
+                    }
+                }
+            }
+
+            if (currentState == State.FILE_LENGHT) {
+                getFileLenght(buf);
+            }
+
+            if (currentState == State.FILE) {
+                writeFile(buf);
+            }
+        }
+        if (buf.readableBytes() == 0) {
+            buf.release();
+        }
+    }
+
+    private void getFileNameLenght(ByteBuf buf){
+        if (buf.readableBytes() >= 4) {  // считывает long
+            System.out.println("STATE: GET filename lenght");
+            nextLenght = buf.readInt();
+            currentState = State.NAME;
+        }
+    }
+
+    private String getName(ByteBuf buf) throws Exception {
+        byte [] fileName = new byte[nextLenght];
+        buf.readBytes(fileName);
+        String fn = new String(fileName, "UTF-8");
+        return fn;
+    }
+
+    private void createFile(Path s) throws Exception {
+        newFile = Files.createFile(s);
+        System.out.println("STATE Filename received - " + s.getFileName());
+        currentState = State.FILE_LENGHT;
+        //out = new BufferedOutputStream(newFile.toString(), true);
+        out = new BufferedOutputStream(new FileOutputStream( newFile.toString()));
+    }
+
+    private Path getPathOnServer(String fn) {
+        Path path = Paths.get(fn); // получили Path  в виде network_storage-client/1.txt
+        path = path.getFileName(); //получили Path  имя файла 1.txt
+        Path serverPath = Paths.get(serverStorage + path.toString());
+        return serverPath;
+    }
+
+    private void getFileLenght(ByteBuf buf) {
+        if (buf.readableBytes() >= 8) {
+            fileLenght = buf.readLong();
+            System.out.println("STATE: File lenght received - " + fileLenght);
+            currentState = State.FILE;
+        }
+    }
+
+    private void writeFile(ByteBuf buf) throws Exception {
+        while (buf.readableBytes() > 0) {
+            out.write(buf.readByte());
+            receivedFileLenght++;
+            if (fileLenght == receivedFileLenght) {
+                System.out.println("File received");
+                out.close();
+                resetState();
+                return;
+            }
+        }
+        out.flush();
+    }
+
+    private void resetState() {
+        currentState = State.IDLE;
+        nextLenght = 0;
+        fileLenght = 0L;
+        receivedFileLenght = 0L;
+        FileOutputStream out = null;
+        newFile = null;
+        comand = (byte) 0;
+        renameFile = null;
+    }
+
+}
+
