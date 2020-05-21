@@ -9,13 +9,11 @@ public class OutgoingMessageHandler extends ChannelOutboundHandlerAdapter {
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        String fileNameString = (String) msg;  //"1client-storage/1.txt"
-        Path fileNamePath = Paths.get(fileNameString).getFileName();
+        String storageString = (String) msg;  //"1client-storage/1.txt"
+        Path storagePath = Paths.get(storageString);
         ProtoFileSender pfs = new ProtoFileSender(ctx, "1client-storage/");
-        Path fileNewName = Paths.get("5.txt");
-//        pfs.sendFile(Comand.DELETE_FILE_FromClient, fileNamePath, null);
-//        pfs.sendFile(Comand.RENAME_FILE_FromServer, fileNamePath,  fileNewName, future -> {
-                pfs.sendFile(Comand.WRITE_FILE, fileNamePath, future -> {
+
+        pfs.sendFile(Comand.DOWNLOAD_FILE_ToClient, storagePath, future -> {
             if (!future.isSuccess()) {
                 future.cause().printStackTrace();
                 System.out.println("Файл не передан");
@@ -26,6 +24,8 @@ public class OutgoingMessageHandler extends ChannelOutboundHandlerAdapter {
 //                Network.getInstance().stop();
             }
         });
+       // pfs.renaneFile(Comand.RENAME_FILE_ToClient, storagePath, Paths.get("5.txt"), null);
+
     }
 
 

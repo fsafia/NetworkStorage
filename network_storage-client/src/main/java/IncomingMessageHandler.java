@@ -22,7 +22,7 @@ public class IncomingMessageHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         System.out.println("client connect");
-        ctx.write("1client-storage/1.txt");
+        ctx.write("1client-storage/1.odt");
         ctx.flush();
     }
 }

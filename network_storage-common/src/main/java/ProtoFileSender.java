@@ -17,15 +17,12 @@ public class ProtoFileSender {
     }
 
     public void sendFile(Comand comand, Path storagePath, ChannelFutureListener finishListener) throws IOException {
-        Path p = storagePath.getFileName();//было 1srver-storage/1.txt стало 1.txt
-//        String pathString = pathStringToFile + storagePath.toString(); // путь в client-storage/
-//        Path pathFile = Paths.get(pathString);
-//        System.out.println(pathFile);
 
-        if (comand == Comand.DELETE_FILE_FromClient && Files.exists(pathFile)) {
-            Files.delete(pathFile);
+        if (comand == Comand.DELETE_FILE_FromClient && Files.exists(storagePath)) {
+            Files.delete(storagePath);
             return;
         }
+
         byte[] filenameBytes = storagePath.getFileName().toString().getBytes(StandardCharsets.UTF_8);
         ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1 + 4 + filenameBytes.length );
         buf.writeByte(comand.getNumberComand());
@@ -36,9 +33,9 @@ public class ProtoFileSender {
             case WRITE_FILE:
                 ctx.write(buf);
                 buf = ByteBufAllocator.DEFAULT.directBuffer(8);
-                buf.writeLong(Files.size(pathFile));
+                buf.writeLong(Files.size(storagePath));
                 ctx.writeAndFlush(buf);
-                FileRegion region = new DefaultFileRegion(pathFile.toFile(), 0, Files.size(pathFile));
+                FileRegion region = new DefaultFileRegion(storagePath.toFile(), 0, Files.size(storagePath));
                 ChannelFuture transferOperationFuture = ctx.writeAndFlush(region);
                 if (finishListener != null) {
                     transferOperationFuture.addListener(finishListener);
@@ -47,22 +44,23 @@ public class ProtoFileSender {
             case DELETE_FILE_FromServer:
                 ctx.writeAndFlush(buf);
                 break;
-            case DELETE_FILE_FromClient:
-
+            case DOWNLOAD_FILE_ToClient:
+                ctx.writeAndFlush(buf);
+                break;
         }
     }
 
-    public void sendFile(Comand comand, Path pathOld, Path pathNew, ChannelFutureListener finishListener) throws IOException {
+    public void renaneFile(Comand comand, Path pathOld, Path pathNew, ChannelFutureListener finishListener) throws IOException {
         switch (comand) {
             case RENAME_FILE_ToClient:
-                String pathOldString = pathStringToFile + pathOld.toString(); // путь в client-storage/1.txt
-                Path pathOldhFile = Paths.get(pathOldString);
-
-                String pathNewString = pathStringToFile + pathNew.toString(); // путь в client-storage/1.txt
-                Path pathNewhFile = Paths.get(pathNewString);
-                if (Files.exists(pathOldhFile)) {
-                    if (!Files.exists(pathNewhFile)) {
-                        Files.move(pathOldhFile, pathNewhFile);
+//                String pathOldString = pathStringToFile + pathOld.toString(); // путь в client-storage/1.txt
+//                Path pathOldhFile = Paths.get(pathOldString);
+//                String pathNewString = pathStringToFile + pathNew.toString(); // путь в client-storage/1.txt
+                pathNew = Paths.get(pathStringToFile + pathNew.toString());
+                if (Files.exists(pathOld)) {
+                    if (!Files.exists(pathNew)) {
+                        Files.move(pathOld, pathNew);
+                        System.out.println("Файл  переименован");
                     } else {
                         System.out.println("Файл не переименован, файл с  новым названием уже существует. ");
                     }
@@ -85,5 +83,3 @@ public class ProtoFileSender {
         }
     }
 }
-
-//не сделала папку client-storage
