@@ -7,11 +7,9 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 public class ServerNetty {
-    public void run()  throws Exception {   /////////////////////////throws Exception??????????????????????????????????7
-        // пул потоков для обработки подключенией клиентов
-        EventLoopGroup bossGroup = new NioEventLoopGroup();
-        // пул потоков для обработки сетевых подключений
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+    public void run()  throws Exception {
+        EventLoopGroup bossGroup = new NioEventLoopGroup();     // Пул потоков для обработки подключений клиентов
+        EventLoopGroup workerGroup = new NioEventLoopGroup();   // пул потоков для обработки сетевых подключений
         try {
             // Cоздание настроек сервера
             ServerBootstrap b = new ServerBootstrap();
@@ -19,7 +17,7 @@ public class ServerNetty {
                     .channel(NioServerSocketChannel.class) // указание канала для подключения новых клиентов
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
-                            socketChannel.pipeline().addLast(new StringToByteBufHandler(), new FirstHahdler(), new SecondHandler(), new GatewayHandler(), new FinalHandler());
+                            socketChannel.pipeline().addLast(new SendFileHandler(), new ProtoHandler());
                         }
                     });
             ChannelFuture f = b.bind(8189).sync(); // запуск прослушивания порта 8189 для подключения клиентов

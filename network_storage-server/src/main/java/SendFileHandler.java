@@ -2,7 +2,7 @@ import io.netty.channel.*;
 
 import java.nio.file.Path;
 
-public class StringToByteBufHandler extends ChannelOutboundHandlerAdapter {
+public class SendFileHandler extends ChannelOutboundHandlerAdapter {
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
         Path serverPath = (Path) msg; // 1server-storage/1.txt

@@ -11,9 +11,9 @@ public class MyClient {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
 
         try {
-            Bootstrap b = new Bootstrap();                    // (1)
-            b.group(workerGroup);                             // (2)
-            b.channel(NioSocketChannel.class);                // (3)
+            Bootstrap b = new Bootstrap();
+            b.group(workerGroup);
+            b.channel(NioSocketChannel.class);
             b.option(ChannelOption.SO_KEEPALIVE, true);
             b.handler(new ChannelInitializer<SocketChannel>() {
                 @Override
