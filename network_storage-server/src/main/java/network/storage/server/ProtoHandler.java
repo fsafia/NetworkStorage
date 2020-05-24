@@ -1,6 +1,9 @@
+package network.storage.server;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import network.storage.common.Protocol;
 
 public class ProtoHandler extends ChannelInboundHandlerAdapter {
     Protocol protocol;
@@ -10,6 +13,7 @@ public class ProtoHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        AuthHandler authHandler = ctx.pipeline().get(AuthHandler.class);
         ByteBuf buf = (ByteBuf) msg;
         while (buf.readableBytes() > 0) {
             protocol.executeComand(ctx, buf);

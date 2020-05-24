@@ -1,5 +1,8 @@
+package network.storage.common;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
+import network.storage.common.Comand;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
@@ -22,7 +25,7 @@ public class Protocol {
     ArrayList<Path> renameFile;
     private String storage;
 
-    Protocol(String storage) {
+    public Protocol(String storage) {
         this.storage = storage;
     }
 
@@ -30,17 +33,17 @@ public class Protocol {
         while (buf.isReadable()) {
             if(currentState == State.IDLE) {
                 comand = buf.readByte();
-                if (Comand.WRITE_FILE.getNumberComand() == comand
-                    || Comand.DELETE_FILE_FromServer.getNumberComand() == comand
-                    || Comand.RENAME_FILE_FromServer.getNumberComand() == comand
-                    || Comand.DOWNLOAD_FILE_ToClient.getNumberComand() == comand) {
-                                                                                     // 1-команда для записи файла на сервер
-                    currentState = State.NAME_LENGHT;                               // 2- удаление с сервера
-                    receivedFileLenght = 0L;                                        // 3- переименование
-                    renameFile = new ArrayList<>(2);                   // 4 - cкачивание файла
+                if (Comand.WRITE_FILE.getNumberComand() == comand                   // 1-команда для записи файла на сервер
+                    || Comand.DELETE_FILE_FromServer.getNumberComand() == comand    // 2- удаление с сервера
+                    || Comand.RENAME_FILE_FromServer.getNumberComand() == comand    // 3- переименование
+                    || Comand.DOWNLOAD_FILE_ToClient.getNumberComand() == comand) { // 4 - cкачивание файла
+
+                    currentState = State.NAME_LENGHT;
+                    receivedFileLenght = 0L;
+                    renameFile = new ArrayList<>(2);
                     System.out.println("STATE: Start file receiving");
                 } else {
-                    System.out.println("другую команду"); /////////////////////////////////////////////
+                    System.out.println("другую команду");
                 }
             }
 
@@ -121,7 +124,6 @@ public class Protocol {
         newFile = Files.createFile(s);
         System.out.println("STATE Filename received - " + s.getFileName());
         currentState = State.FILE_LENGHT;
-        //out = new BufferedOutputStream(newFile.toString(), true);
         out = new BufferedOutputStream(new FileOutputStream( newFile.toString()));
     }
 

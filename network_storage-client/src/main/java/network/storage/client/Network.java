@@ -1,14 +1,22 @@
+package network.storage.client;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
-public class MyClient {
-    public Channel currentChannel;
+public class Network {
+    OutgoingMessageHandler outMessagHandler = new OutgoingMessageHandler();
+    IncomingMessageHandler inMessageHandlernew = new IncomingMessageHandler();
+    private Channel currentChannel;
 
-    public void start() {
+    public Channel getCurrentChannel() {
+        return currentChannel;
+    }
+    public  void start() {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
+
 
         try {
             Bootstrap b = new Bootstrap();
@@ -18,7 +26,7 @@ public class MyClient {
             b.handler(new ChannelInitializer<SocketChannel>() {
                 @Override
                 public void initChannel(SocketChannel socketChannel) throws Exception {
-                    socketChannel.pipeline().addLast(new OutgoingMessageHandler(), new IncomingMessageHandler());
+                    socketChannel.pipeline().addLast(outMessagHandler, inMessageHandlernew);
                     currentChannel = socketChannel;
                 }
             });
@@ -37,7 +45,7 @@ public class MyClient {
     }
 
     public static void main(String[] args) {
-        MyClient myClient = new MyClient();
+        Network myClient = new Network();
         myClient.start();
     }
 }

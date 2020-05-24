@@ -1,6 +1,9 @@
+package network.storage.common;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.*;
+import network.storage.common.Comand;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -11,7 +14,7 @@ import java.nio.file.Paths;
 public class ProtoFileSender {
     private  String pathStringToFile;
     private  ChannelHandlerContext ctx;
-    ProtoFileSender(ChannelHandlerContext ctx, String pathStringToFile) {
+    public ProtoFileSender(ChannelHandlerContext ctx, String pathStringToFile) {
         this.pathStringToFile = pathStringToFile;
         this.ctx = ctx;
     }

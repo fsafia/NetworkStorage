@@ -1,3 +1,5 @@
+package network.storage.common;
+
 public enum  Comand {
     WRITE_FILE((byte)1),
     DELETE_FILE_FromServer((byte)2),
