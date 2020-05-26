@@ -6,34 +6,49 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
+import java.net.InetSocketAddress;
+import java.util.concurrent.CountDownLatch;
+
 public class Network {
-    OutgoingMessageHandler outMessagHandler = new OutgoingMessageHandler();
-    IncomingMessageHandler inMessageHandlernew = new IncomingMessageHandler();
-    private Channel currentChannel;
+
+    public Network(Controller c) {
+        this.c = c;
+        inMessageHandler = new IncomingMessageHandler(c);
+    }
+     Controller c;
+//    OutgoingMessageHandler outMessagHandler;
+    IncomingMessageHandler inMessageHandler;
+    public Channel currentChannel;
+    ChannelHandlerContext ctx;
+
+//    public Network(Controller c) {
+//        this.c = c;
+//        inMessageHandler = new IncomingMessageHandler(c);
+////        outMessagHandler = new OutgoingMessageHandler();
+//
+//    }
 
     public Channel getCurrentChannel() {
         return currentChannel;
     }
-    public  void start() {
+
+    public  void start(CountDownLatch countDownLatch) {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
-
-
         try {
             Bootstrap b = new Bootstrap();
             b.group(workerGroup);
             b.channel(NioSocketChannel.class);
-            b.option(ChannelOption.SO_KEEPALIVE, true);
+            b.remoteAddress(new InetSocketAddress("localhost", 8189));
             b.handler(new ChannelInitializer<SocketChannel>() {
-                @Override
                 public void initChannel(SocketChannel socketChannel) throws Exception {
-                    socketChannel.pipeline().addLast(outMessagHandler, inMessageHandlernew);
+                    socketChannel.pipeline().addLast(/*outMessagHandler, */inMessageHandler);
                     currentChannel = socketChannel;
                 }
             });
 
             // Start the client.
-            ChannelFuture f = b.connect("localhost", 8189).sync();   // (4)
-
+            ChannelFuture f = b.connect().sync();   // (4)
+            countDownLatch.countDown();
             f.channel().closeFuture().sync();
 
         } catch ( InterruptedException e) {
@@ -41,11 +56,5 @@ public class Network {
         } finally {
             workerGroup.shutdownGracefully();
         }
-
-    }
-
-    public static void main(String[] args) {
-        Network myClient = new Network();
-        myClient.start();
     }
 }

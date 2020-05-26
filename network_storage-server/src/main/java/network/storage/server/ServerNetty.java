@@ -20,7 +20,8 @@ public class ServerNetty {
                     .channel(NioServerSocketChannel.class) // указание канала для подключения новых клиентов
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
-                            socketChannel.pipeline().addLast(new SendFileHandler(), new AuthHandler(), new ProtoHandler());
+ //                           socketChannel.pipeline().addLast(new SendFileHandler(), new AuthHandler(), new ProtoHandler());
+                            socketChannel.pipeline().addLast(new AuthHandler(), new ProtoHandler());
                         }
                     });
             ChannelFuture f = b.bind(8189).sync(); // запуск прослушивания порта 8189 для подключения клиентов

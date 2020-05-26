@@ -3,9 +3,14 @@ package network.storage.server;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import network.storage.common.Comand;
+import network.storage.common.ProtoFileSender;
+import network.storage.common.ProtocolLogPass;
 
 public class AuthHandler extends ChannelInboundHandlerAdapter {
     private boolean authOk = false;
+    private String nick;
+    ProtocolLogPass protocolLogPass = new ProtocolLogPass();
 
 
     @Override
@@ -13,15 +18,17 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
         if (authOk) {
             ctx.fireChannelRead(msg);
         } else {
-            ByteBuf logAndPassBuf = (ByteBuf) msg;
-            byte[] logAndPassByte = new byte[10];
-            logAndPassBuf.readBytes(logAndPassByte); //считали из буфера в массив
+            ByteBuf bufMsg = (ByteBuf) msg;
+            ProtoFileSender protoFileSender = new ProtoFileSender(ctx.channel());
+            protocolLogPass.executeComand(ctx,bufMsg);
+            nick = AuthService.getNickByLoginAndPass(protocolLogPass.log, protocolLogPass.pass);
+            if (nick != null) {
+                authOk = true;
+                protoFileSender.sendAuth(Comand.AUTH_OK, nick, null);//отправить ответ клиенту авторизован
 
-            String logAndPassString = new String(logAndPassByte, "UTF-8");
-            String login = logAndPassString.split(" ")[0];
-            String password = logAndPassString.split(" ")[1];
-            System.out.println(AuthService.getNickByLoginAndPass(login, password));
-            authOk = true;
+            } else {
+                protoFileSender.sendAuth(Comand.AUTH_NOT_OK, "неверный логин пароль", null);
+            }
         }
     }
 
@@ -31,7 +38,7 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
         ctx.close();
     }
 
-    public boolean isAuthOk() {
+    public boolean getAuthOk() {
         return authOk;
     }
 

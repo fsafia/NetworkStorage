@@ -12,46 +12,49 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class ProtoFileSender {
-    private  String pathStringToFile;
-    private  ChannelHandlerContext ctx;
-    public ProtoFileSender(ChannelHandlerContext ctx, String pathStringToFile) {
-        this.pathStringToFile = pathStringToFile;
-        this.ctx = ctx;
+//    private  String pathStringToFile;
+//    private  ChannelHandlerContext ctx;
+    private  Channel channel;
+    public ProtoFileSender(Channel channel /*String pathStringToFile*/) {
+//    public ProtoFileSender(ChannelHandlerContext ctx /*String pathStringToFile*/) {
+//        this.pathStringToFile = pathStringToFile;
+        this.channel = channel;
     }
 
-    public void sendFile(Comand comand, Path storagePath, ChannelFutureListener finishListener) throws IOException {
+//    public void sendMsg(Comand comand, Path storagePath, ChannelFutureListener finishListener) throws IOException {
+//
+//        if (comand == Comand.DELETE_FILE_FromClient && Files.exists(storagePath)) {
+//            Files.delete(storagePath);
+//            return;
+//        }
+//
+//        byte[] filenameBytes = storagePath.getFileName().toString().getBytes(StandardCharsets.UTF_8);
+//        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1 + 4 + filenameBytes.length );
+//        buf.writeByte(comand.getNumberComand());
+//        buf.writeInt(filenameBytes.length);
+//        buf.writeBytes(filenameBytes);
+//
+//        switch (comand) {
+//            case WRITE_FILE:
+//                ctx.write(buf);
+//                buf = ByteBufAllocator.DEFAULT.directBuffer(8);
+//                buf.writeLong(Files.size(storagePath));
+//                ctx.writeAndFlush(buf);
+//                FileRegion region = new DefaultFileRegion(storagePath.toFile(), 0, Files.size(storagePath));
+//                ChannelFuture transferOperationFuture = ctx.writeAndFlush(region);
+//                if (finishListener != null) {
+//                    transferOperationFuture.addListener(finishListener);
+//                }
+//                break;
+//            case DELETE_FILE_FromServer:
+//                ctx.writeAndFlush(buf);
+//                break;
+//            case DOWNLOAD_FILE_ToClient:
+//                ctx.writeAndFlush(buf);
+//                break;
+//        }
+//    }
 
-        if (comand == Comand.DELETE_FILE_FromClient && Files.exists(storagePath)) {
-            Files.delete(storagePath);
-            return;
-        }
-
-        byte[] filenameBytes = storagePath.getFileName().toString().getBytes(StandardCharsets.UTF_8);
-        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1 + 4 + filenameBytes.length );
-        buf.writeByte(comand.getNumberComand());
-        buf.writeInt(filenameBytes.length);
-        buf.writeBytes(filenameBytes);
-
-        switch (comand) {
-            case WRITE_FILE:
-                ctx.write(buf);
-                buf = ByteBufAllocator.DEFAULT.directBuffer(8);
-                buf.writeLong(Files.size(storagePath));
-                ctx.writeAndFlush(buf);
-                FileRegion region = new DefaultFileRegion(storagePath.toFile(), 0, Files.size(storagePath));
-                ChannelFuture transferOperationFuture = ctx.writeAndFlush(region);
-                if (finishListener != null) {
-                    transferOperationFuture.addListener(finishListener);
-                }
-                break;
-            case DELETE_FILE_FromServer:
-                ctx.writeAndFlush(buf);
-                break;
-            case DOWNLOAD_FILE_ToClient:
-                ctx.writeAndFlush(buf);
-                break;
-        }
-    }
 
     public void renaneFile(Comand comand, Path pathOld, Path pathNew, ChannelFutureListener finishListener) throws IOException {
         switch (comand) {
@@ -59,7 +62,7 @@ public class ProtoFileSender {
 //                String pathOldString = pathStringToFile + pathOld.toString(); // путь в client-storage/1.txt
 //                Path pathOldhFile = Paths.get(pathOldString);
 //                String pathNewString = pathStringToFile + pathNew.toString(); // путь в client-storage/1.txt
-                pathNew = Paths.get(pathStringToFile + pathNew.toString());
+//                pathNew = Paths.get(pathStringToFile + pathNew.toString());
                 if (Files.exists(pathOld)) {
                     if (!Files.exists(pathNew)) {
                         Files.move(pathOld, pathNew);
@@ -82,7 +85,49 @@ public class ProtoFileSender {
                 buf.writeBytes(oldFileNameBytes);
                 buf.writeInt(newFileNameBytes.length);
                 buf.writeBytes(newFileNameBytes);
-                ctx.writeAndFlush(buf);
+ //               ctx.writeAndFlush(buf);
         }
     }
+
+    ////////////////////////
+    public void sendAuth(Comand comand, String str, ChannelFutureListener finishListener) throws IOException {
+        byte[] filenameBytes = str.getBytes(StandardCharsets.UTF_8);
+        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1 + 4 + filenameBytes.length );
+        buf.writeByte(comand.getNumberComand());
+        buf.writeInt(filenameBytes.length);
+        buf.writeBytes(filenameBytes);
+        channel.writeAndFlush(buf);
+    }
+
+//        if (comand == Comand.DELETE_FILE_FromClient && Files.exists(storagePath)) {
+//            Files.delete(storagePath);
+//            return;
+//        }
+//
+//        byte[] filenameBytes = storagePath.getFileName().toString().getBytes(StandardCharsets.UTF_8);
+//        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1 + 4 + filenameBytes.length );
+//        buf.writeByte(comand.getNumberComand());
+//        buf.writeInt(filenameBytes.length);
+//        buf.writeBytes(filenameBytes);
+//
+//        switch (comand) {
+//            case WRITE_FILE:
+//                ctx.write(buf);
+//                buf = ByteBufAllocator.DEFAULT.directBuffer(8);
+//                buf.writeLong(Files.size(storagePath));
+//                ctx.writeAndFlush(buf);
+//                FileRegion region = new DefaultFileRegion(storagePath.toFile(), 0, Files.size(storagePath));
+//                ChannelFuture transferOperationFuture = ctx.writeAndFlush(region);
+//                if (finishListener != null) {
+//                    transferOperationFuture.addListener(finishListener);
+//                }
+//                break;
+//            case DELETE_FILE_FromServer:
+//                ctx.writeAndFlush(buf);
+//                break;
+//            case DOWNLOAD_FILE_ToClient:
+//                ctx.writeAndFlush(buf);
+//                break;
+//        }
+//    }
 }
