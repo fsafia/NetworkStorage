@@ -14,9 +14,10 @@ public class ProtoHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         AuthHandler authHandler = ctx.pipeline().get(AuthHandler.class);
+
         ByteBuf buf = (ByteBuf) msg;
         while (buf.readableBytes() > 0) {
-            protocol.executeComand(ctx, buf);
+            protocol.executeComand(ctx, buf, authHandler.getNick());
         }
     }
 

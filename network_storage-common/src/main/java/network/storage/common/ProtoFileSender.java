@@ -56,9 +56,9 @@ public class ProtoFileSender {
 //    }
 
 
-    public void renaneFile(Comand comand, Path pathOld, Path pathNew, ChannelFutureListener finishListener) throws IOException {
+    public void renaneFile(byte comand, Path pathOld, Path pathNew, ChannelFutureListener finishListener) throws IOException {
         switch (comand) {
-            case RENAME_FILE_ToClient:
+            case Comand.RENAME_FILE_TO_CLIENT:
 //                String pathOldString = pathStringToFile + pathOld.toString(); // путь в client-storage/1.txt
 //                Path pathOldhFile = Paths.get(pathOldString);
 //                String pathNewString = pathStringToFile + pathNew.toString(); // путь в client-storage/1.txt
@@ -74,13 +74,13 @@ public class ProtoFileSender {
                     System.out.println("Файл не переименован, файла для переименования не существует. ");
                 }
                 break;
-            case RENAME_FILE_FromServer:
+            case Comand.RENAME_FILE_FromServer:
                 pathOld = pathOld.getFileName();
                 pathNew = pathNew.getFileName();
                 byte[] oldFileNameBytes = pathOld.toString().getBytes(StandardCharsets.UTF_8);
                 byte[] newFileNameBytes = pathNew.toString().getBytes(StandardCharsets.UTF_8);
                 ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1 + 4 + oldFileNameBytes.length + 4 +  newFileNameBytes.length);
-                buf.writeByte(comand.getNumberComand());
+                buf.writeByte(comand);
                 buf.writeInt(oldFileNameBytes.length);
                 buf.writeBytes(oldFileNameBytes);
                 buf.writeInt(newFileNameBytes.length);
@@ -90,12 +90,17 @@ public class ProtoFileSender {
     }
 
     ////////////////////////
-    public void sendAuth(Comand comand, String str, ChannelFutureListener finishListener) throws IOException {
+    public void sendComand(byte comand, String str, ChannelFutureListener finishListener) throws IOException {
         byte[] filenameBytes = str.getBytes(StandardCharsets.UTF_8);
         ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1 + 4 + filenameBytes.length );
-        buf.writeByte(comand.getNumberComand());
+        buf.writeByte(comand);
         buf.writeInt(filenameBytes.length);
         buf.writeBytes(filenameBytes);
+        channel.writeAndFlush(buf);
+    }
+    public void sendClose(byte comand) {
+        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1);
+        buf.writeByte(comand);
         channel.writeAndFlush(buf);
     }
 

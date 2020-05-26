@@ -1,10 +1,17 @@
 package network.storage.server;
 
 import java.sql.*;
+import java.util.Vector;
 
 public class AuthService {
     private static Connection connection;
     private static Statement stmt;
+
+    private static Vector<String> userList = new Vector<>();
+    public static Vector<String> getUserList() {
+        return userList;
+    }
+
 
     public static void connect() {
         try {
@@ -44,10 +51,40 @@ public class AuthService {
         return null;
     }
 
+    //для проверки уникальности логина при регистрации в базе данных
+    public static boolean isLoginUnique(String login) {
+        boolean rezult = true;
+        String sql = String.format("select nick from users where login = '%s'", login);
+        ResultSet rs = null; //по нашему запросу может вернуться 1 строка или 0
+        try {
+            rs = stmt.executeQuery(sql);
+            if (rs.next()) {
+                rezult = false;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rezult;
+    }
+    //для проверки уникальности nick при регистрации в базе данных
+    public static boolean isNickUnique(String nick) {
+        String sql = String.format("select login from users where nick = '%s'", nick);
+        ResultSet rs = null; //по нашему запросу может вернуться 1 строка или 0
+        try {
+            rs = stmt.executeQuery(sql);
+            if (rs.next()) {
+                return false;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
     //добавление в таблицу users новых зарегистрированных клиентов
     public static void addUser(String login, String pass, String nick) {
         try {
-            String query = "INSERT INTO users (login, password, nickname) VALUES (?, ?, ?);";
+            String query = "INSERT INTO users (login, password, nick) VALUES (?, ?, ?);";
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, login);
             ps.setInt(2, pass.hashCode());

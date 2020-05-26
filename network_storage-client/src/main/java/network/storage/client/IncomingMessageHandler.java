@@ -11,6 +11,7 @@ public class IncomingMessageHandler extends ChannelInboundHandlerAdapter {
     ProtocolLogPass protocolLogPass = new ProtocolLogPass();
     Controller c;
 
+
     public IncomingMessageHandler(Controller c) {
         this.c = c;
     }
@@ -18,8 +19,11 @@ public class IncomingMessageHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf buf = (ByteBuf) msg;
+        byte comand = buf.readByte();
+
         if (!c.getIsAuthorized()) {
-            protocolLogPass.executeComand(ctx, buf);
+            ProtocolLogPass protocolLogPass = new ProtocolLogPass();
+            protocolLogPass.executeComand(comand, ctx, buf);
             c.authResponse(protocolLogPass.comand, protocolLogPass.msgString);
 
         } else {

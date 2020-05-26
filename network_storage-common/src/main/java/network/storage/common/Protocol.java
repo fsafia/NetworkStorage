@@ -29,14 +29,17 @@ public class Protocol {
         this.storage = storage;
     }
 
-    public void executeComand(ChannelHandlerContext ctx, ByteBuf buf) throws Exception{
+    public void executeComand(ChannelHandlerContext ctx, ByteBuf buf, String nik) throws Exception{
         while (buf.isReadable()) {
             if(currentState == State.IDLE) {
                 comand = buf.readByte();
-                if (Comand.WRITE_FILE.getNumberComand() == comand                   // 1-команда для записи файла на сервер
-                    || Comand.DELETE_FILE_FromServer.getNumberComand() == comand    // 2- удаление с сервера
-                    || Comand.RENAME_FILE_FromServer.getNumberComand() == comand    // 3- переименование
-                    || Comand.DOWNLOAD_FILE_ToClient.getNumberComand() == comand) { // 4 - cкачивание файла
+                if (Comand.CLIENT_CLOSE == comand) { // 15- клиент отключился
+
+                }
+                if (Comand.WRITE_FILE == comand                   // 1-команда для записи файла на сервер
+                    || Comand.DELETE_FILE_FromServer == comand    // 2- удаление с сервера
+                    || Comand.RENAME_FILE_FromServer == comand    // 3- переименование
+                    || Comand.DOWNLOAD_FILE_TO_CLIENT == comand ) {   // 4 - cкачивание файла
 
                     currentState = State.NAME_LENGHT;
                     receivedFileLenght = 0L;
@@ -57,14 +60,14 @@ public class Protocol {
 
                     Path storagePath = getPathOnStorage(name);  //Path в виде "1server-storage/1.txt"
 
-                    if (Comand.WRITE_FILE.getNumberComand() == comand ) {
+                    if (Comand.WRITE_FILE == comand ) {
                         if (Files.exists(storagePath)) { //--------------добавить проверку на существование файла и директории
                             Files.delete(storagePath);
                         }
                         createFile(storagePath);  //создан пустой файл с названием 1.txt
                     }
 
-                    if (Comand.DELETE_FILE_FromServer.getNumberComand() == comand) {
+                    if (Comand.DELETE_FILE_FromServer == comand) {
                         if (Files.exists(storagePath)) { //--------------добавить проверку на существование файла и директории
                             Files.delete(storagePath);
                             System.out.println("Файл " + storagePath + " удален");
@@ -74,7 +77,7 @@ public class Protocol {
                         resetState();
                     }
 
-                    if (Comand.RENAME_FILE_FromServer.getNumberComand() == comand ) {  // 351.txt55.txt -(3команда-5длина старИмени-1.тхт-5длинаНовИмени-5т.хт
+                    if (Comand.RENAME_FILE_FromServer == comand ) {  // 351.txt55.txt -(3команда-5длина старИмени-1.тхт-5длинаНовИмени-5т.хт
                         renameFile.add(storagePath);                                     //byteIntNameOldIntNameNew
                         if (renameFile.size() == 1) {  //получили Path , renameFile(0)- это старое имя файла
                             nextLenght = 0;
@@ -85,7 +88,7 @@ public class Protocol {
                             resetState();
                         }
                     }
-                    if (Comand.DOWNLOAD_FILE_ToClient.getNumberComand() == comand) {
+                    if (Comand.DOWNLOAD_FILE_TO_CLIENT == comand) {
                         ctx.write(storagePath);
                         resetState();
                     }

@@ -1,7 +1,6 @@
 package network.storage.client;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
@@ -12,10 +11,7 @@ import javafx.scene.layout.HBox;
 import network.storage.common.Comand;
 import network.storage.common.ProtoFileSender;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.Socket;
 import java.util.concurrent.CountDownLatch;
 
 
@@ -165,16 +161,16 @@ public class Controller {
             network.start(networkStarter);
         }).start();
         networkStarter.await();
+        channel = network.currentChannel;
+        protoFileSender = new ProtoFileSender(channel/*, "1client-storage"*/);
     }
     public void tryToAuth(ActionEvent actionEvent) throws IOException, InterruptedException {
         if (channel == null ){
             connect();
-            channel = network.currentChannel;
-            protoFileSender = new ProtoFileSender(channel/*, "1client-storage"*/);
         }
 
         String authString = loginField.getText() + " " + passwordField.getText();
-        protoFileSender.sendAuth(Comand.TRY_TO_AUTH,authString, future -> {
+        protoFileSender.sendComand(Comand.TRY_TO_AUTH, authString, future -> {
             if (!future.isSuccess()) {
                 future.cause().printStackTrace();
                 System.out.println("Log and Pass не передан");
@@ -185,50 +181,36 @@ public class Controller {
 //                Network.getInstance().stop();
             }
         });
-
-
-//        try {
-//            out.writeUTF("/auth " + loginField.getText() + " " + passwordField.getText());
-//            loginField.clear();
-//            passwordField.clear();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
+        loginField.clear();
+        passwordField.clear();
     }
 
-    public void tryToSignup(ActionEvent actionEvent){
-//        if (socket == null || socket.isClosed()){
-//            connect();
-//        }
-//        try {
-//            out.writeUTF("/signup " + signupLoginField.getText() + " " + signupPasswordField.getText() + " " + signupNickField.getText());
-//            signupLoginField.clear();
-            signupPasswordField.clear();
-            signupNickField.clear();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+    public void tryToSignup(ActionEvent actionEvent) throws InterruptedException, IOException {
+        if (channel == null ){
+            connect();
+        }
+        String signupString = signupLoginField.getText() + " " + signupPasswordField.getText() + " " + signupNickField.getText();
+        protoFileSender.sendComand(Comand.TRY_TO_SIGNUP, signupString, null);
+        signupLoginField.clear();
+        signupPasswordField.clear();
+        signupNickField.clear();
+
 
     }
 
     public void authResponse(byte comand, String response) {
-        if (comand == Comand.AUTH_OK.getNumberComand()) {
+        if (comand == Comand.AUTH_OK) {
             setAuthorized(true);
         }
-        if (comand == Comand.AUTH_NOT_OK.getNumberComand()) {
+        if (comand == Comand.AUTH_NOT_OK) {
             textArea.appendText(response + "\n");
         }
     }
 
     public void Dispose(){
         System.out.println("Отправляем сообщение на сервер о завершении работы");
-//        try {
-//            if (out != null){
-//                out.writeUTF("/end");
-//            }
-//        }catch (IOException e){
-//            e.printStackTrace();
-//        }
+        if(channel != null ){
+            protoFileSender.sendClose(Comand.CLIENT_CLOSE);
+        }
     }
 }
