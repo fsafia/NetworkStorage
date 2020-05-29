@@ -3,10 +3,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.ListView;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import network.storage.common.Comand;
 import network.storage.common.ProtoFileSender;
@@ -31,7 +28,7 @@ public class Controller {
     @FXML
     PasswordField passwordField, signupPasswordField;
     @FXML
-    ListView<String> clientsList, clientsBlockList;
+    ListView<String> remoteStorage, localStorage;
 
 
 
@@ -53,20 +50,20 @@ public class Controller {
             upperPanel.setManaged(true);
             bottomPanel.setVisible(false);
             bottomPanel.setManaged(false);
-            clientsList.setVisible(false);
-            clientsList.setManaged(false);
-            clientsBlockList.setVisible(false);
-            clientsBlockList.setManaged(false);
+            remoteStorage.setVisible(false);
+            remoteStorage.setManaged(false);
+            localStorage.setVisible(false);
+            localStorage.setManaged(false);
         } else {
-            textArea.clear();
+//            textArea.clear();
             upperPanel.setVisible(false);
             upperPanel.setManaged(false);
             bottomPanel.setVisible(true);
             bottomPanel.setManaged(true);
-            clientsList.setVisible(true);
-            clientsList.setManaged(true);
-            clientsBlockList.setVisible(true);
-            clientsBlockList.setManaged(true);
+            remoteStorage.setVisible(true);
+            remoteStorage.setManaged(true);
+            localStorage.setVisible(true);
+            localStorage.setManaged(true);
         }
     }
 
@@ -203,6 +200,14 @@ public class Controller {
             setAuthorized(true);
         }
         if (comand == Comand.AUTH_NOT_OK) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Test Connection");
+
+            // Header Text: null
+            alert.setHeaderText(null);
+            alert.setContentText("Connect to the database successfully!");
+
+            alert.showAndWait();
             textArea.appendText(response + "\n");
         }
     }

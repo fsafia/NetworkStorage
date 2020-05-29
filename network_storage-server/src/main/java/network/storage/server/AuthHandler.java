@@ -39,7 +39,6 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
                 if (chekLogAndPass(log, pass, nick)) {
                     authOk = true;
                     AuthService.getUserList().add(nick);
-                    System.out.println(AuthService.getUserList());
                 }
             }
 

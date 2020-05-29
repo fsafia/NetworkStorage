@@ -3,14 +3,25 @@ package network.storage.client;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import network.storage.common.Protocol;
+import network.storage.common.Comand;
+import network.storage.common.ProtocolComand;
+import network.storage.common.ProtocolFile;
 import network.storage.common.ProtocolLogPass;
 
 public class IncomingMessageHandler extends ChannelInboundHandlerAdapter {
-    Protocol protocol = new Protocol("1client-storage/");
+    ProtocolFile protocol = new ProtocolFile("1client-storage");
+    ProtocolComand protocolCom = new ProtocolComand("1client-storage/");
     ProtocolLogPass protocolLogPass = new ProtocolLogPass();
     Controller c;
 
+    public enum Response {IDLE, COMAND, FILE}
+
+    ;
+    private Response currentResponse = Response.IDLE;
+    private Runnable finishOperation = () -> {
+        System.out.println("Файл загружен");
+        currentResponse = Response.IDLE;//////////////////добавить обновление списка файлов?
+    };
 
     public IncomingMessageHandler(Controller c) {
         this.c = c;
@@ -18,21 +29,38 @@ public class IncomingMessageHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        ByteBuf buf = (ByteBuf) msg;
-        byte comand = buf.readByte();
-
         if (!c.getIsAuthorized()) {
+            ByteBuf buf = (ByteBuf) msg;
+            byte comand = buf.readByte();
             ProtocolLogPass protocolLogPass = new ProtocolLogPass();
             protocolLogPass.executeComand(comand, ctx, buf);
-            c.authResponse(protocolLogPass.comand, protocolLogPass.msgString);
+            c.authResponse(comand, protocolLogPass.msgString);
 
         } else {
+            ByteBuf buf = (ByteBuf) msg;
             while (buf.readableBytes() > 0) {
-                protocol.executeComand(ctx, buf);
+                if (currentResponse == Response.IDLE) {
+                    byte comand = buf.readByte();
+                    if (comand == Comand.WRITE_FILE) {
+                        currentResponse = Response.FILE;
+                    } else {
+                        currentResponse = Response.COMAND;
+                        protocolCom.setComand(comand);
+                    }
+                }
+
+                if (currentResponse == Response.FILE) {
+                    protocol.writeFile(ctx, buf, "", finishOperation);
+                }
+
+//                if (currentResponse == Response.COMAND) {
+//                    protocolCom.executeComand(ctx, buf,finishOperation);
+//                }
+            }
+            if (buf.readableBytes() == 0) {
+                buf.release();
             }
         }
-
-
     }
 
     @Override
@@ -41,11 +69,4 @@ public class IncomingMessageHandler extends ChannelInboundHandlerAdapter {
         ctx.close();
     }
 
-    @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("client connect");
-        ctx.write("1client-storage/1.odt");
-        ctx.write("1client-storage/2.txt");
-        ctx.flush();
-    }
 }

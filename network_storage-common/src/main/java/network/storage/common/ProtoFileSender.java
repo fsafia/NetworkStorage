@@ -11,6 +11,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static network.storage.common.Comand.WRITE_FILE;
+
 public class ProtoFileSender {
 //    private  String pathStringToFile;
 //    private  ChannelHandlerContext ctx;
@@ -102,6 +104,21 @@ public class ProtoFileSender {
         ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1);
         buf.writeByte(comand);
         channel.writeAndFlush(buf);
+    }
+    public void sendFile(Path storagePath) throws IOException {
+        FileRegion region = new DefaultFileRegion(storagePath.toFile(), 0, Files.size(storagePath));
+        byte[] fileNameBytes = storagePath.getFileName().toString().getBytes(StandardCharsets.UTF_8);
+        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1 + 4 + fileNameBytes.length + 8);
+        buf.writeByte(WRITE_FILE);
+        buf.writeInt(fileNameBytes.length);
+        buf.writeBytes(fileNameBytes);
+        buf.writeLong(Files.size(storagePath));
+        channel.writeAndFlush(buf);
+        ChannelFuture transferOperationFuture = channel.writeAndFlush(region);
+//            if (finishListener != null) {
+//                transferOperationFuture.addListener(finishListener);
+//            }
+
     }
 
 //        if (comand == Comand.DELETE_FILE_FromClient && Files.exists(storagePath)) {
