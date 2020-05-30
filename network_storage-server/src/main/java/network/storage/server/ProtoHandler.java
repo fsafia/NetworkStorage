@@ -29,6 +29,7 @@ public class ProtoHandler extends ChannelInboundHandlerAdapter {
         ByteBuf buf = (ByteBuf) msg;
         AuthHandler authHandler = ctx.pipeline().get(AuthHandler.class);
         protocolCom.setNick(authHandler.getNick());//передает ник каждый раз
+        String n = authHandler.getNick();
 
         while (buf.readableBytes() > 0) {
             if (currentRequest == Request.IDLE) {

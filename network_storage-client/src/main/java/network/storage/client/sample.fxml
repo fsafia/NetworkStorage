@@ -38,22 +38,15 @@
 
     <HBox VBox.vgrow="ALWAYS">
         <VBox HBox.hgrow="ALWAYS">
-            <!--<TextArea fx:id="textArea" editable="false" VBox.vgrow="ALWAYS"/>-->
+            <TextArea fx:id="textArea" editable="false" VBox.vgrow="ALWAYS"/>
             <HBox fx:id="bottomPanel" managed="false" visible="false">
-                <!--<TextField fx:id="textField" HBox.hgrow="ALWAYS" promptText="Введите сообщение..." onAction="#sendMsg"/>-->
-                <TextField fx:id="textField" HBox.hgrow="ALWAYS" promptText="Введите сообщение..."/>
-                <!--<Button fx:id="btn1" text="send" onAction="#sendMsg"/>-->
-                <Button fx:id="btnDelRemoteFile" text="Delete remote file" />
-                <Button fx:id="btnDelLocalFile" text="Delete local file" />
-                <Button fx:id="btnRenameRemoteFile" text="Rename remote file" />
-                <Button fx:id="btnRenameLocalFile" text="Rename local file" />
-                <Button fx:id="btnDownloadFile" text="Download file" />
-                <Button fx:id="btnSendFile" text="Send file" />
+                <TextField fx:id="textField" HBox.hgrow="ALWAYS" promptText="Введите сообщение..." />
+                <Button fx:id="btn1" text="send"/>
 
             </HBox>
-         </VBox>
-        <ListView fx:id="remoteStorage" managed="false" prefWidth="300" />
-        <ListView fx:id="localStorage" managed="false"  prefWidth="300" />
+        </VBox>
+        <ListView fx:id="clientsList" managed="false" prefWidth="300" />
+        <ListView fx:id="clientsBlockList" managed="false"  prefWidth="300" />
 
     </HBox>
 
