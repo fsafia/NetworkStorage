@@ -72,14 +72,14 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
     private boolean chekLogAndPass(String log, String pass, String nick) throws IOException {
         if (nick != null) {
             if (isNickInUserList(nick)) {
-                protoFileSender.sendComand(Comand.AUTH_NOT_OK, "пользователь с " + nick + " уже авторизован. ", null);
+                protoFileSender.sendComand(Comand.AUTH_NOT_OK, "Пользователь с " + nick + " уже авторизован! ", null);
                 return false;
             } else {
                 protoFileSender.sendComand(Comand.AUTH_OK, nick, null);//отправить ответ клиенту авторизован
                 return true;
             }
         } else {
-            protoFileSender.sendComand(Comand.AUTH_NOT_OK, "неверный логин пароль", null);
+            protoFileSender.sendComand(Comand.AUTH_NOT_OK, "Неверный логин, пароль!", null);
             return false;
         }
     }
@@ -91,11 +91,11 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
                 protoFileSender.sendComand(Comand.AUTH_OK, nick, null);//отправить ответ клиенту авторизован
                 return true;
             } else {
-                protoFileSender.sendComand(Comand.AUTH_NOT_OK, "пользователь с " + nickNew + " уже существует", null);
+                protoFileSender.sendComand(Comand.AUTH_NOT_OK, "Пользователь с " + nickNew + " уже существует!", null);
                 return false;
             }
         } else {
-            protoFileSender.sendComand(Comand.AUTH_NOT_OK, "пользователь с " + log + " уже существует", null);
+            protoFileSender.sendComand(Comand.AUTH_NOT_OK, "Пользователь с " + log + " уже существует!", null);
             return false;
         }
     }

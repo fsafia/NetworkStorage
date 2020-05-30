@@ -105,7 +105,7 @@ public class ProtoFileSender {
         buf.writeByte(comand);
         channel.writeAndFlush(buf);
     }
-    public void sendFile(Path storagePath) throws IOException {
+    public void sendFile(Path storagePath, ChannelFutureListener finishListener) throws IOException {
         FileRegion region = new DefaultFileRegion(storagePath.toFile(), 0, Files.size(storagePath));
         byte[] fileNameBytes = storagePath.getFileName().toString().getBytes(StandardCharsets.UTF_8);
         ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1 + 4 + fileNameBytes.length + 8);

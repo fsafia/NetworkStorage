@@ -11,6 +11,9 @@ import network.storage.common.Comand;
 import network.storage.common.ProtoFileSender;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.CountDownLatch;
 
 
@@ -163,7 +166,7 @@ public class Controller {
         channel = network.currentChannel;
         protoFileSender = new ProtoFileSender(channel/*, "1client-storage"*/);
     }
-    public void sendMsg (ActionEvent actionEvent){}
+
 
     public void tryToAuth(ActionEvent actionEvent) throws IOException, InterruptedException {
         if (channel == null ){
@@ -195,8 +198,15 @@ public class Controller {
         signupLoginField.clear();
         signupPasswordField.clear();
         signupNickField.clear();
+    }
 
+    public void sendMsg (ActionEvent actionEvent) {
 
+    }
+    public void sendFileToServer (ActionEvent actionEvent) throws IOException {
+        String requestFile = "1client-storage/" + textField.getText();
+        Path filePath = Paths.get(requestFile);
+        protoFileSender.sendFile(filePath, null);
     }
 
     public void authResponse(byte comand, String response) {
@@ -206,16 +216,11 @@ public class Controller {
         if (comand == Comand.AUTH_NOT_OK) {
             Platform.runLater(() -> {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Test Connection");
-
-                // Header Text: null
-                alert.setHeaderText(null);
-                alert.setContentText("Connect to the database successfully!");
-
+                alert.setTitle("Подключиться не удалось!");
+                alert.setHeaderText(null);// Header Text: null
+                alert.setContentText(response);
                 alert.showAndWait();
             });
-
- //           textArea.appendText(response + "\n");
         }
     }
 

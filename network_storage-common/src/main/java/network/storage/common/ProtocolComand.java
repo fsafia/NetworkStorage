@@ -135,7 +135,7 @@ public class ProtocolComand {
                 break;
             case Comand.DOWNLOAD_FILE_TO_CLIENT:
                 if (Files.exists(storagePath)) {
-                   protoFileSender.sendFile(storagePath);
+                   protoFileSender.sendFile(storagePath, null);
                 }
                 break;
         }

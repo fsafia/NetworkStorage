@@ -65,7 +65,7 @@ public class ProtocolFile {
                     if (Files.exists(storagePath)) {
                         Files.delete(storagePath);
                     }
-                    createFile(storagePath);  //создан пустой файл с названием 1.txt
+                    createFile(storagePath, nik);  //создан пустой файл с названием 1.txt
                 }
             }
 
@@ -93,9 +93,12 @@ public class ProtocolFile {
             }
     }
 
-    private void createFile(Path s) throws Exception {
-        newFile = Files.createFile(s);
-        System.out.println("STATE Filename received - " + s.getFileName());
+    private void createFile(Path storagePath, String nick) throws Exception {
+        if (!Files.exists(Paths.get(storage,nick))) {
+            Files.createDirectory(Paths.get(storage,nick));
+        }
+        newFile = Files.createFile(storagePath);
+        System.out.println("STATE Filename received - " + storagePath.getFileName());
         currentState = State.FILE_LENGHT;
         out = new BufferedOutputStream(new FileOutputStream( newFile.toString()));
     }
@@ -103,7 +106,7 @@ public class ProtocolFile {
     private Path getPathOnStorage(String fn, String nick) {
         Path path = Paths.get(fn); // получили Path  в виде network_storage-client/1.txt
         path = path.getFileName(); //получили Path  имя файла 1.txt
-        Path serverPath = Paths.get(storage + nick + "/" + path.toString());
+        Path serverPath = Paths.get(storage,nick, path.toString());
         return serverPath;
     }
 
