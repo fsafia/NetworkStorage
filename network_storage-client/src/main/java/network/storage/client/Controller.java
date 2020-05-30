@@ -6,6 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import network.storage.common.Comand;
 import network.storage.common.ProtoFileSender;
 
@@ -21,7 +22,7 @@ public class Controller {
     TextField textField;
 
     @FXML
-    HBox bottomPanel;
+    VBox bottomPanel;
     @FXML
     HBox upperPanel;
     @FXML
@@ -162,6 +163,8 @@ public class Controller {
         channel = network.currentChannel;
         protoFileSender = new ProtoFileSender(channel/*, "1client-storage"*/);
     }
+    public void sendMsg (ActionEvent actionEvent){}
+
     public void tryToAuth(ActionEvent actionEvent) throws IOException, InterruptedException {
         if (channel == null ){
             connect();
