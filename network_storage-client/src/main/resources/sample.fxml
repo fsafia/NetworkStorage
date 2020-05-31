@@ -35,7 +35,7 @@
         <VBox HBox.hgrow="ALWAYS">
             <TextArea fx:id="textArea" editable="false" VBox.vgrow="ALWAYS"/>
             <VBox fx:id="bottomPanel" managed="false" visible="false">
-                <TextField fx:id="textField" HBox.hgrow="ALWAYS" promptText="Введите сообщение..." />
+                <TextField fx:id="textField" HBox.hgrow="ALWAYS" editable="false" promptText="Имя файла" />
                 <Button fx:id="btn1" text="send"/>
                 <Button  text="send file to server" onAction="#sendFileToServer"/>
                 <Button  text="download to client" onAction="#downloadToClient"/>

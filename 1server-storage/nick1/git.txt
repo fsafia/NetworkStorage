@@ -1,0 +1,104 @@
+команды GIT
+pwd - показывает в каком катологе мы сейчас находимся
+git init - создаем новую репозиторию в существующем каталоге. Репозитрия представляет собой католог ".git"
+ls -la - просмотр папок в каталоге
+cat имя файла - просмотр файла
+git status - показывает статус файлов
+git add (имя файла или .) - пишем имя файла или "."(добавляются все файлы и папки из текущей директории) добаляем файлы в track
+git branch - показывает какие бранчи существуют и на каком бранче мы сейчас
+git branch blue - создает бранч с именем blue
+git checkout -b blue - создает и переключается на бранч blue.
+git branch -a - показывает все LOCAL бранчи
+gir branch -r - shows remote branches
+git checkout master  -переключается на бранч master
+
+git merge branch2 - мержим branch2 с текущем бранчем (вливаем изменения в текущий бранч)
+git reset --hard HEAD	- in case of don't want to resolve conflicts
+
+Tree .git  - показывает содержание директории
+Deflate - можно посмотреть содержимое файла
+
+git cat-file -t 4fd1(указали sha-1) - показывает что это - в нашем случае комит, если укажем на хэш tree, то скажет нам что это tree
+git cat-file -p 4fd1  - показывает tree -его хэш и др информацию
+
+git remote - показывает какие удаленнные ссылки есть
+git remote add  {имя ссыдки} {адрес ссылки} - добавляет удаленный репозиторий
+
+git fetch {имя ссылки} - скачивает с удаленного репозитория недостающую инфу. После этого становится доступной для чтения ветка {имя ссылки}\master
+git fetch origin dev2 - скачивает с сервера origin ветку dev2
+
+git push [удал. сервер] [ветка] - отправка данных на удаленный сервер с указанной ветки.
+Если до нас кто уже сделал push, то наш запрос будет отклонен. Мы сначала должны  сами
+Скачать актуальный коммит, смержить со своим и после этого только выкладываться
+
+ git remote show [удал. сервер] - инфа из удаленного репозитория. Можно в конце указать только ту ветку которая нас интересует
+git remote add origin https://github.com/user/repo.git - добавляет удаленный репозиторий по указанному url с локальным названием origin
+ git remote rename pb paul - переименовывает название удаленного репозитория с pb на paul
+git remote rm paul - удаляет удаленный репозиторий paul
+
+git tag - просмотр имеющихся меток
+git tag -l 'v1.4.2.*' - поиск меток по шаблону
+ git tag -a v1.4 -m 'my version 1.4' - создает аннотированную метку(-a), -m задает меточное сообщение, которое будет храниться вместе с меткой
+ git show v1.4 - просмотр метки
+
+git branch -d hotfix - удаляет ветку hotfix, -d - означает удалить
+ git branch --merged - показывает ветки, которые уже слили с текущей
+ git branch --no-merged - показывает ветки, которые мы еще НЕ слили с текущей.  здесь нельзя удалить(через ключ  -d) ветку, которая еще НЕ слита, можно удалит через -D - но тогда удалятся и ВСЕ наработки
+git branch -m old_branch_name new_branch_name - переименовывает бранч
+git branch -m  new_branch_name - переименовывает текущий бранч
+
+git push origin serverfix или так git push origin serverfix:serverfix - отправка данных наудаленный сервер, на сервер с сылкой origin, отправляется с бранча serverfix . Если не укажем бранч, то будет отправляться с бранча по умолчанию
+git push -f origin serverfix - полная синхронизация с локальной копией, если надо, то на удаленном бранче сервера origin удаляются некоторые комиты
+git push -f origin HEAD^:master - удаляет послдений комиит на ветки master с сервера origin. здесь важен флаг -f - благодаря ему происходит удаление, иначе быа бы ошибка
+
+ git checkout -b serverfix origin/serverfix или  git checkout --track origin/serverfix(в версии 1.6 и выше) - создание ветки на основе удаленной ветки  origin/serverfix и эта ветка становится отслеживаемой веткой, в нее будет укладываться push
+
+git push [удал. сервер] :[ветка] - удаление ветки [ветка] на сервере [удал.сервер]
+
+git clean -f(force)d(directory) - removes untracked files from your working directory.
+
+git update-ref refs/heads/master 1a410efbd13591db07496601ebc7a059dd55cfe9 - устанавливает бранч master на данный комит
+
+git commit --amend -m "New commit message" - изменяет коммент комита и изменяет хэш комита
+
+git reset --hard HEAD~1 — больше никто и никогда не увидит этот позорный коммит.
+git reset --hard HEAD~3 — вернее, три последних коммита. Никто. Никогда.
+
+слияние нескольких комитов
+git rebase -i <commit> - указываем коммит, который самый крайний НЕ участвующий в сквоше. Далее снизу вверх говорим squash, кроме последнего.  
+git rebase --abort - так можно прервать интерактивный режим
+
+rebase
+например есть бранч А и мы хотим этот комит переместить выше бранча Б. Мы переключаемся на бранч А и далее делаем git rebase B, после этого бранч А будет идти сразу после бранча Б
+
+git stash - спрятать
+git stash list - просмотреть что спрятано
+git stash apply stash@{0} - достать из стэша "stash@{0}", при этом она в хранилище стэша остается
+git stash drop - delete stash
+
+git ls-remote origin - show all remote commits
+git reset --hard gitlab/develop_auriga - после мержа можно откатить конфликты мержа
+
+git pull - -rebase origin dev  - вытащить данные с сервера через rebase, а НЕ через merge
+
+tags
+git fetch --tags - fetch all tags
+git ls-remote origin - просмотр всех удаленных тэгов
+git tag v7.9.3 - create tag v7.9.3
+
+ignore
+
+
+commits are local
+add some files to  ~/.gitignore_global
+git config --global core.excludesfile ~/.gitignore_global
+
+Команы CMD
+tree  -показывает дерево каталогов
+
+не показывал монитор
+inxi -Fxz - выводи инфы, была ошибка Display Server: X.Org 1.18.4 drivers: intel (unloaded: fbdev,vesa) FAILED: nouveau
+to resolve it on LinuxMint my noteboot
+Menu-administration-driver-manager->choose nvidia-390(Version 390.48-0ubuntu0-gpu16.04.2)
+Version:	390.48
+Release Date:	2018.3.28

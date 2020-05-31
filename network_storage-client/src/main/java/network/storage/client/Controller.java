@@ -3,8 +3,10 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import network.storage.common.Comand;
@@ -71,6 +73,14 @@ public class Controller {
             localStorage.setManaged(true);
             serverStorage.setVisible(true);
             serverStorage.setManaged(true);
+
+            localStorage.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    textField.clear();
+                    textField.setText(localStorage.getSelectionModel().getSelectedItem());
+                }
+            });
         }
     }
 
@@ -250,6 +260,10 @@ public class Controller {
         for (String f: fileList ) {
             localStorage.getItems().add(f);
         }
+    }
+
+    public String selectItemFromLocalStorage() {
+        return localStorage.getSelectionModel().getSelectedItem();
     }
 
     public void Dispose(){
