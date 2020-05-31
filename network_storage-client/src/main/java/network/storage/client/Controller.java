@@ -14,7 +14,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.stream.Collectors;
 
 
 public class Controller {
@@ -33,7 +35,7 @@ public class Controller {
     @FXML
     PasswordField passwordField, signupPasswordField;
     @FXML
-    ListView<String> clientsList, clientsBlockList;
+    ListView<String> localStorage, serverStorage;
 
 
 
@@ -55,20 +57,20 @@ public class Controller {
             upperPanel.setManaged(true);
             bottomPanel.setVisible(false);
             bottomPanel.setManaged(false);
-            clientsList.setVisible(false);
-            clientsList.setManaged(false);
-            clientsBlockList.setVisible(false);
-            clientsBlockList.setManaged(false);
+            localStorage.setVisible(false);
+            localStorage.setManaged(false);
+            serverStorage.setVisible(false);
+            serverStorage.setManaged(false);
         } else {
             textArea.clear();
             upperPanel.setVisible(false);
             upperPanel.setManaged(false);
             bottomPanel.setVisible(true);
             bottomPanel.setManaged(true);
-            clientsList.setVisible(true);
-            clientsList.setManaged(true);
-            clientsBlockList.setVisible(true);
-            clientsBlockList.setManaged(true);
+            localStorage.setVisible(true);
+            localStorage.setManaged(true);
+            serverStorage.setVisible(true);
+            serverStorage.setManaged(true);
         }
     }
 
@@ -204,20 +206,30 @@ public class Controller {
 
     }
 
+    public void deleteRemoteFile (ActionEvent actionEvent) throws IOException {
+        protoFileSender.sendComand(Comand.DELETE_FILE_FromServer, textField.getText(), null);
+        textField.clear();
+    }
+
+    public void deleteLocalFile (ActionEvent actionEvent) throws IOException {
+        Path p = Paths.get("1storage-client", textField.getText());
+        Files.delete(Paths.get("1client-storage", textField.getText()));
+        textField.clear();
+    }
+
     public void sendFileToServer (ActionEvent actionEvent) throws IOException {
-        String requestFile = "1client-storage/" + textField.getText();
-        Path filePath = Paths.get(requestFile);
-        protoFileSender.sendFile(filePath, null);
+        protoFileSender.sendFile(Paths.get("1client-storage", textField.getText()), null);
         textField.clear();
     }
     public void downloadToClient (ActionEvent actionEvent) throws IOException {
-        Path requestFileToClient = Paths.get(textField.getText());
         protoFileSender.sendComand(Comand.DOWNLOAD_FILE_TO_CLIENT, textField.getText(), null);
+        textField.clear();
     }
 
-    public void authResponse(byte comand, String response) {
+    public void authResponse(byte comand, String response) throws IOException {
         if (comand == Comand.AUTH_OK) {
             setAuthorized(true);
+            updateLocalStorage();
         }
         if (comand == Comand.AUTH_NOT_OK) {
             Platform.runLater(() -> {
@@ -227,6 +239,16 @@ public class Controller {
                 alert.setContentText(response);
                 alert.showAndWait();
             });
+        }
+    }
+    public void updateLocalStorage() throws IOException {
+        List<String> fileList = Files.list(Paths.get("1client-storage"))
+                .filter(p -> !Files.isDirectory(p))
+                .map(p -> p.getFileName().toString())
+                .collect(Collectors.toList());
+        localStorage.getItems().clear();
+        for (String f: fileList ) {
+            localStorage.getItems().add(f);
         }
     }
 

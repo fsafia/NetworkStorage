@@ -49,7 +49,7 @@ public class ProtoHandler extends ChannelInboundHandlerAdapter {
             }
 
             if (currentRequest == Request.COMAND) {
-                protocolCom.executeComand(ctx, buf,finishOperation);//передает ник каждый раз
+                protocolCom.executeComand(ctx, buf,finishOperation);
             }
         }
         if (buf.readableBytes() == 0) {

@@ -39,15 +39,15 @@
                 <Button fx:id="btn1" text="send"/>
                 <Button  text="send file to server" onAction="#sendFileToServer"/>
                 <Button  text="download to client" onAction="#downloadToClient"/>
-                <Button  text="delete remote file" onAction="#sendMsg"/>
-                <Button  text="delete local file" onAction="#sendMsg"/>
+                <Button  text="delete remote file" onAction="#deleteRemoteFile"/>
+                <Button  text="delete local file" onAction="#deleteLocalFile"/>
                 <Button  text="rename remote file" onAction="#sendMsg"/>
                 <Button  text="rename local file" onAction="#sendMsg"/>
 
             </VBox>
         </VBox>
-        <ListView fx:id="clientsList" managed="false" prefWidth="300" />
-        <ListView fx:id="clientsBlockList" managed="false"  prefWidth="300" />
+        <ListView fx:id="localStorage" managed="false" prefWidth="300" />
+        <ListView fx:id="serverStorage" managed="false"  prefWidth="300" />
 
     </HBox>
 

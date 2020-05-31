@@ -4,13 +4,10 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 
 public class ProtocolComand {
     public enum State {IDLE, MSG_LENGHT, MSG}
@@ -20,13 +17,16 @@ public class ProtocolComand {
     private long receivedMsgLenght;
     private byte comand;
     private String storage;
-    private StringBuffer sb;
+    private StringBuffer msgTextSb;
     private String nick;
 
     public void setNick(String nick) {
         this.nick = nick;
     }
 
+    public StringBuffer getMsgTextSb() {
+        return msgTextSb;
+    }
     public void setComand(byte comand) {
         this.comand = comand;
     }
@@ -39,11 +39,12 @@ public class ProtocolComand {
         if (currentState == State.IDLE) {
             if (Comand.DELETE_FILE_FromServer == comand              // 2- удаление с сервера
                     || Comand.RENAME_FILE_FromServer == comand       // 3- переименование
-                    || Comand.DOWNLOAD_FILE_TO_CLIENT == comand) {  // 4 - cкачивание файла
+                    || Comand.DOWNLOAD_FILE_TO_CLIENT == comand     // 4 - cкачивание файла
+                    || Comand.AUTH_NOT_OK == comand) {              // 12 - команда не выполнена
 
                 currentState = State.MSG_LENGHT;
                 receivedMsgLenght = 0L;
-                sb = new StringBuffer();
+                msgTextSb = new StringBuffer();
                 System.out.println("STATE: Start comand receiving");
             } else {
                 System.out.println("отправьте другую команду");
@@ -59,10 +60,10 @@ public class ProtocolComand {
 
         if (currentState == State.MSG) {
             while (buf.readableBytes() > 0) {
-                sb.append((char) buf.readByte()); // ?
+                msgTextSb.append((char) buf.readByte()); // ?
                 receivedMsgLenght++;
                 if (msgLenght == receivedMsgLenght) {
-                    defineCmd(comand, sb.toString(), ctx.channel());
+                    defineCmd(comand, msgTextSb.toString(), ctx.channel());
                     resetState();
                     finishOperation.run();
                     return;
@@ -129,7 +130,7 @@ public class ProtocolComand {
                 break;
             case Comand.RENAME_FILE_FromServer:
                 String fileNewName = sb.split(" ")[1]; //byte_msgLenght_msg(в виде fileOld.txt_fileNew.txt)
-                Path storagePathNew = Paths.get(storage + nick + fileNewName);
+                Path storagePathNew = Paths.get(storage,nick, fileNewName);
                 Files.move(storagePath, storagePathNew);
                 /////////////////////////////если файлы с такими именами не существуют???
                 break;

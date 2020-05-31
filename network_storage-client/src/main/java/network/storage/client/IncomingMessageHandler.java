@@ -10,7 +10,7 @@ import network.storage.common.ProtocolLogPass;
 
 public class IncomingMessageHandler extends ChannelInboundHandlerAdapter {
     ProtocolFile protocol = new ProtocolFile("1client-storage");
-    ProtocolComand protocolCom = new ProtocolComand("1client-storage/");
+    ProtocolComand protocolCom = new ProtocolComand("1client-storage");
     ProtocolLogPass protocolLogPass = new ProtocolLogPass();
     Controller c;
 
@@ -43,10 +43,11 @@ public class IncomingMessageHandler extends ChannelInboundHandlerAdapter {
                     byte comand = buf.readByte();
                     if (comand == Comand.WRITE_FILE) {
                         currentResponse = Response.FILE;
-                    } else {
-                        currentResponse = Response.COMAND;
-                        protocolCom.setComand(comand);
                     }
+//                    else {
+//                        currentResponse = Response.COMAND;  //возможна только команда о запрсосе несущ файла
+//                        protocolCom.setComand(comand);
+//                    }
                 }
 
                 if (currentResponse == Response.FILE) {
@@ -55,6 +56,7 @@ public class IncomingMessageHandler extends ChannelInboundHandlerAdapter {
 
 //                if (currentResponse == Response.COMAND) {
 //                    protocolCom.executeComand(ctx, buf,finishOperation);
+//                    c.authResponse(Comand.AUTH_NOT_OK, protocolCom.getMsgTextSb().toString());
 //                }
             }
             if (buf.readableBytes() == 0) {

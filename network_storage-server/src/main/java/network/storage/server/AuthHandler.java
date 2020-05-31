@@ -52,7 +52,6 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
                     System.out.println(AuthService.getUserList());
                 } else {
                     nick = null;
-                    System.out.println(AuthService.getUserList());
                 }
             }
         }
