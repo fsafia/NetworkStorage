@@ -13,11 +13,6 @@
 <VBox fx:id="boxArea" fx:controller="network.storage.client.Controller" xmlns:fx="http://javafx.com/fxml" alignment="center">
     <HBox fx:id="upperPanel">
 
-        <!--<TextField HBox.hgrow="ALWAYS" promptText="Логин" fx:id="loginField"/>
-        <PasswordField promptText="Пароль" fx:id="passwordField" onAction="#tryToAuth"/>
-        <Button text="Авторизоваться" onAction="#tryToAuth"/>-->
-
-
         <VBox HBox.hgrow="ALWAYS" >
             <TextField fx:id="loginField" promptText="Логин"  />
             <PasswordField fx:id="passwordField" onAction="#tryToAuth" promptText="Пароль" />
@@ -39,14 +34,18 @@
     <HBox VBox.vgrow="ALWAYS">
         <VBox HBox.hgrow="ALWAYS">
             <TextArea fx:id="textArea" editable="false" VBox.vgrow="ALWAYS"/>
-            <HBox fx:id="bottomPanel" managed="false" visible="false">
-                <!--<TextField fx:id="textField" HBox.hgrow="ALWAYS" promptText="Введите сообщение..." onAction="#sendMsg"/>-->
+            <VBox fx:id="bottomPanel" managed="false" visible="false">
                 <TextField fx:id="textField" HBox.hgrow="ALWAYS" promptText="Введите сообщение..." />
-                <Button fx:id="btn1" text="send" />
-                <!--<Button fx:id="btn1" text="send" onAction="#sendMsg"/>-->
+                <Button fx:id="btn1" text="send"/>
+                <Button  text="send file to server" onAction="#sendFileToServer"/>
+                <Button  text="download to client" onAction="#downloadToClient"/>
+                <Button  text="delete remote file" onAction="#sendMsg"/>
+                <Button  text="delete local file" onAction="#sendMsg"/>
+                <Button  text="rename remote file" onAction="#sendMsg"/>
+                <Button  text="rename local file" onAction="#sendMsg"/>
 
-            </HBox>
-         </VBox>
+            </VBox>
+        </VBox>
         <ListView fx:id="clientsList" managed="false" prefWidth="300" />
         <ListView fx:id="clientsBlockList" managed="false"  prefWidth="300" />
 

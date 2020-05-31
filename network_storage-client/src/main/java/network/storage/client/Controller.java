@@ -203,10 +203,16 @@ public class Controller {
     public void sendMsg (ActionEvent actionEvent) {
 
     }
+
     public void sendFileToServer (ActionEvent actionEvent) throws IOException {
         String requestFile = "1client-storage/" + textField.getText();
         Path filePath = Paths.get(requestFile);
         protoFileSender.sendFile(filePath, null);
+        textField.clear();
+    }
+    public void downloadToClient (ActionEvent actionEvent) throws IOException {
+        Path requestFileToClient = Paths.get(textField.getText());
+        protoFileSender.sendComand(Comand.DOWNLOAD_FILE_TO_CLIENT, textField.getText(), null);
     }
 
     public void authResponse(byte comand, String response) {

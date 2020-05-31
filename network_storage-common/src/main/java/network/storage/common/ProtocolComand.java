@@ -44,7 +44,7 @@ public class ProtocolComand {
                 currentState = State.MSG_LENGHT;
                 receivedMsgLenght = 0L;
                 sb = new StringBuffer();
-                System.out.println("STATE: Start file receiving");
+                System.out.println("STATE: Start comand receiving");
             } else {
                 System.out.println("отправьте другую команду");
             }
@@ -117,7 +117,7 @@ public class ProtocolComand {
     public void defineCmd (byte comand, String sb, Channel channel) throws IOException {
         ProtoFileSender protoFileSender = new ProtoFileSender(channel);
         String fileName = sb.split(" ")[0];
-        Path storagePath = Paths.get(storage + nick + fileName);
+        Path storagePath = Paths.get(storage,nick, fileName);
         switch (comand) {
             case Comand.DELETE_FILE_FromServer:
                 if (Files.exists(storagePath)) {

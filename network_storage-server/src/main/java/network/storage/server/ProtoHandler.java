@@ -17,7 +17,7 @@ public class ProtoHandler extends ChannelInboundHandlerAdapter {
 
     ProtoHandler() {
         protocol = new ProtocolFile("1server-storage");
-        protocolCom = new ProtocolComand("1server-storage/");
+        protocolCom = new ProtocolComand("1server-storage");
 
     }
     public enum Request {IDLE,COMAND, FILE};
@@ -36,7 +36,6 @@ public class ProtoHandler extends ChannelInboundHandlerAdapter {
                 if (comand == Comand.CLIENT_CLOSE) { //если user  авторизовался и закрыл соединение
                     ctx.close();
                     AuthService.getUserList().remove(authHandler.getNick());
-                    System.out.println(AuthService.getUserList());
                 } else if (comand == Comand.WRITE_FILE) {
                     currentRequest = Request.FILE;
                 } else {
