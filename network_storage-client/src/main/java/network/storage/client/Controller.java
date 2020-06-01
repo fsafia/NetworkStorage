@@ -11,10 +11,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import network.storage.common.Comand;
 import network.storage.common.ProtoFileSender;
-
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -31,7 +29,7 @@ public class Controller {
     @FXML
     HBox workPanel;
     @FXML
-    HBox authPanel;
+    VBox authPanel;
     @FXML
     TextField loginField, signupLoginField, signupNickField;
     @FXML
@@ -54,36 +52,15 @@ public class Controller {
     public void setAuthorized(boolean isAuthorized){
         this.isAuthorized = isAuthorized;
         if(!isAuthorized){
-            //
             authPanel.setVisible(true);
             authPanel.setManaged(true);
             workPanel.setVisible(false);
             workPanel.setManaged(false);
-
-//            authPanel.setVisible(true);
-//            authPanel.setManaged(true);
-//            workPanel.setVisible(false);
-//            workPanel.setManaged(false);
-//            localStorage.setVisible(false);
-//            localStorage.setManaged(false);
-//            serverStorage.setVisible(false);
-//            serverStorage.setManaged(false);
         } else {
-            //
             authPanel.setVisible(false);
             authPanel.setManaged(false);
             workPanel.setVisible(true);
             workPanel.setManaged(true);
-
-
-//            authPanel.setVisible(false);
-//            authPanel.setManaged(false);
-//            workPanel.setVisible(true);
-//            workPanel.setManaged(true);
-//            localStorage.setVisible(true);
-//            localStorage.setManaged(true);
-//            serverStorage.setVisible(true);
-//            serverStorage.setManaged(true);
 
             localStorage.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 @Override
@@ -110,8 +87,8 @@ public class Controller {
             network.start(networkStarter);
         }).start();
         networkStarter.await();
-        channel = network.currentChannel;
-        protoFileSender = new ProtoFileSender(channel/*, "1client-storage"*/);
+        channel = network.getCurrentChannel();
+        protoFileSender = new ProtoFileSender(channel);
     }
 
 
@@ -121,17 +98,7 @@ public class Controller {
         }
 
         String authString = loginField.getText() + " " + passwordField.getText();
-        protoFileSender.sendComand(Comand.TRY_TO_AUTH, authString, future -> {
-            if (!future.isSuccess()) {
-                future.cause().printStackTrace();
-                System.out.println("Log and Pass не передан");
-//                Network.getInstance().stop();
-            }
-            if (future.isSuccess()) {
-                System.out.println("Log and Pass успешно передан");
-//                Network.getInstance().stop();
-            }
-        });
+        protoFileSender.sendComand(Comand.TRY_TO_AUTH, authString, null);
         loginField.clear();
         passwordField.clear();
     }
@@ -145,10 +112,6 @@ public class Controller {
         signupLoginField.clear();
         signupPasswordField.clear();
         signupNickField.clear();
-    }
-
-    public void sendMsg (ActionEvent actionEvent) {
-
     }
 
     public void deleteRemoteFile (ActionEvent actionEvent) throws IOException {
@@ -209,6 +172,10 @@ public class Controller {
         for (String f: fileList ) {
             localStorage.getItems().add(f);
         }
+    }
+
+    public void renameLocalFile(ActionEvent actionEvent)  {
+
     }
 
     public String selectItemFromLocalStorage() {

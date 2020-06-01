@@ -20,7 +20,7 @@ public class IncomingMessageHandler extends ChannelInboundHandlerAdapter {
     private Response currentResponse = Response.IDLE;
     private Runnable finishOperation = () -> {
         System.out.println("Файл загружен");
-        currentResponse = Response.IDLE;//////////////////добавить обновление списка файлов?
+        currentResponse = Response.IDLE;
     };
 
     public IncomingMessageHandler(Controller c) {
@@ -35,7 +35,7 @@ public class IncomingMessageHandler extends ChannelInboundHandlerAdapter {
                 byte comand = buf.readByte();
                 if (comand == Comand.AUTH_NOT_OK || comand == Comand.AUTH_OK) {
                     ProtocolLogPass protocolLogPass = new ProtocolLogPass();
-                    protocolLogPass.executeComand(/*comand, ctx, */buf);
+                    protocolLogPass.executeComand(buf);
                     c.authResponse(comand, protocolLogPass.msgString);
                     currentResponse = Response.IDLE;
                 } else if (comand == Comand.WRITE_FILE) {
@@ -55,50 +55,12 @@ public class IncomingMessageHandler extends ChannelInboundHandlerAdapter {
                 if (protocolCom.serverStorageFiles != null ) {
                     c.updateServerStorage(protocolCom.serverStorageFiles);
                 }
-
-
             }
         }
         if (buf.readableBytes() == 0) {
             buf.release();
         }
-
     }
-//        if (!c.getIsAuthorized()) {
-//            ByteBuf buf = (ByteBuf) msg;
-//            byte comand = buf.readByte();
-//            ProtocolLogPass protocolLogPass = new ProtocolLogPass();
-//            protocolLogPass.executeComand(comand, ctx, buf);
-//            c.authResponse(comand, protocolLogPass.msgString);
-//
-//        } else {
-//            ByteBuf buf = (ByteBuf) msg;
-//            while (buf.readableBytes() > 0) {
-//                if (currentResponse == Response.IDLE) {
-//                    byte comand = buf.readByte();
-//                    if (comand == Comand.WRITE_FILE) {
-//                        currentResponse = Response.FILE;
-//                    }
-////                    else {
-////                        currentResponse = Response.COMAND;  //возможна только команда о запрсосе несущ файла
-////                        protocolCom.setComand(comand);
-////                    }
-//                }
-//
-//                if (currentResponse == Response.FILE) {
-//                    protocol.writeFile(ctx, buf, "", finishOperation);
-//                }
-//
-////                if (currentResponse == Response.COMAND) {
-////                    protocolCom.executeComand(ctx, buf,finishOperation);
-////                    c.authResponse(Comand.AUTH_NOT_OK, protocolCom.getMsgTextSb().toString());
-////                }
-//            }
-//            if (buf.readableBytes() == 0) {
-//                buf.release();
-//            }
-//        }
-//    }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {

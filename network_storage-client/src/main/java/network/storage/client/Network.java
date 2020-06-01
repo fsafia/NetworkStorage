@@ -10,23 +10,19 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.CountDownLatch;
 
 public class Network {
+    public Controller c;
+    public IncomingMessageHandler incomingMessageHandler;
+    private Channel currentChannel;
 
     public Network(Controller c) {
         this.c = c;
-        inMessageHandler = new IncomingMessageHandler(c);
+        incomingMessageHandler = new IncomingMessageHandler(c);
     }
-     Controller c;
-//    OutgoingMessageHandler outMessagHandler;
-    IncomingMessageHandler inMessageHandler;
-    public Channel currentChannel;
+
+
+
     ChannelHandlerContext ctx;
 
-//    public Network(Controller c) {
-//        this.c = c;
-//        inMessageHandler = new IncomingMessageHandler(c);
-////        outMessagHandler = new OutgoingMessageHandler();
-//
-//    }
 
     public Channel getCurrentChannel() {
         return currentChannel;
@@ -41,13 +37,13 @@ public class Network {
             b.remoteAddress(new InetSocketAddress("localhost", 8189));
             b.handler(new ChannelInitializer<SocketChannel>() {
                 public void initChannel(SocketChannel socketChannel) throws Exception {
-                    socketChannel.pipeline().addLast(/*outMessagHandler, */inMessageHandler);
+                    socketChannel.pipeline().addLast(incomingMessageHandler);
                     currentChannel = socketChannel;
                 }
             });
 
             // Start the client.
-            ChannelFuture f = b.connect().sync();   // (4)
+            ChannelFuture f = b.connect().sync();
             countDownLatch.countDown();
             f.channel().closeFuture().sync();
 
