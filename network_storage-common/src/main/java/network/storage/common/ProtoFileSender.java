@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import static network.storage.common.Comand.WRITE_FILE;
 
@@ -99,6 +100,21 @@ public class ProtoFileSender {
         buf.writeInt(filenameBytes.length);
         buf.writeBytes(filenameBytes);
         channel.writeAndFlush(buf);
+    }
+
+    public void sendServerStorageList(byte comand, List<String> serverStorageList) {
+        if (serverStorageList == null) {
+            return;
+        }
+        try {
+            StringBuffer sb = new StringBuffer();
+            for (String file : serverStorageList ) {
+                sb = sb.append(file + "   ");
+            }
+            sendComand(comand, sb.toString(), null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     public void sendClose(byte comand) {
         ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1);

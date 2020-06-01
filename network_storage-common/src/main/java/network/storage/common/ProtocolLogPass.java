@@ -16,7 +16,7 @@ public class ProtocolLogPass {
     public String pass;
     public String nick;
 
-    public void executeComand(byte cmd, ChannelHandlerContext ctx, ByteBuf buf) throws Exception{
+    public void executeComand(/*byte cmd, ChannelHandlerContext ctx,*/ ByteBuf buf) throws Exception{
 
         while (buf.isReadable()) {
             if (currentState == State.MSG_LENGHT) {
@@ -26,12 +26,9 @@ public class ProtocolLogPass {
             if (currentState == State.MSG_TEXT) {
                 if (buf.readableBytes() >= msgLenght) {
                     msgString = getMsgString(buf); //String в виде "log1 pass1"
-                    // ? надо ли менять состояние
+                    return;
                 }
             }
-        }
-        if (buf.readableBytes() == 0) {
-            buf.release();
         }
     }
 

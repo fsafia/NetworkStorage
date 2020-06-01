@@ -12,5 +12,5 @@ public class  Comand {
     public static final byte AUTH_NOT_OK = (byte)12;
     public static final byte AUTH_OK = (byte)13;
     public static final byte CLIENT_CLOSE = (byte)16;
-    public static final byte INFO = (byte)17;
+    public static final byte SERVER_STORAGE_LiST = (byte)17;
 }

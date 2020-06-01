@@ -148,26 +148,6 @@ public class Controller {
 //        }
 //    }
 
-//    public void sendMsg(ActionEvent actionEvent) {
-//        try {
-//            out.writeUTF(textField.getText());
-//            textField.clear();
-//            textField.requestFocus();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    public void Dispose(){
-//        System.out.println("Отправляем сообщение на сервер о завершении работы");
-//        try {
-//            if (out != null){
-//                out.writeUTF("/end");
-//            }
-//        }catch (IOException e){
-//            e.printStackTrace();
-//        }
-//    }
     public void connect() throws InterruptedException {
         CountDownLatch networkStarter = new CountDownLatch(1);
         new Thread(() -> {
@@ -222,9 +202,9 @@ public class Controller {
     }
 
     public void deleteLocalFile (ActionEvent actionEvent) throws IOException {
-        Path p = Paths.get("1storage-client", textField.getText());
         Files.delete(Paths.get("1client-storage", textField.getText()));
         textField.clear();
+        updateLocalStorage();
     }
 
     public void sendFileToServer (ActionEvent actionEvent) throws IOException {
@@ -251,11 +231,25 @@ public class Controller {
             });
         }
     }
-    public void updateLocalStorage() throws IOException {
-        List<String> fileList = Files.list(Paths.get("1client-storage"))
-                .filter(p -> !Files.isDirectory(p))
-                .map(p -> p.getFileName().toString())
-                .collect(Collectors.toList());
+    public void updateServerStorage(String fileList) {
+        String[] files = fileList.split("   ");
+        Platform.runLater(() -> {
+            serverStorage.getItems().clear();
+            for (int i = 0; i < files.length; i++) {
+                serverStorage.getItems().add(files[i]);
+            }
+        });
+    }
+    public void updateLocalStorage() {
+        List<String> fileList = null;
+        try {
+            fileList = Files.list(Paths.get("1client-storage"))
+                    .filter(p -> !Files.isDirectory(p))
+                    .map(p -> p.getFileName().toString())
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         localStorage.getItems().clear();
         for (String f: fileList ) {
             localStorage.getItems().add(f);

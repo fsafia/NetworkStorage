@@ -8,12 +8,17 @@ import network.storage.common.ProtoFileSender;
 import network.storage.common.ProtocolLogPass;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class AuthHandler extends ChannelInboundHandlerAdapter {
     private boolean authOk = false;
     private String nick;
     ProtoFileSender protoFileSender;
     ProtocolLogPass protocolLogPass = new ProtocolLogPass();
+    public List<String> serverStorageList;
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -64,7 +69,7 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
     }
 
     public String getMsgFromClient(byte comand, ChannelHandlerContext ctx, ByteBuf bufMsg) throws Exception {
-        protocolLogPass.executeComand(comand, ctx, bufMsg);
+        protocolLogPass.executeComand(/*comand, ctx,*/ bufMsg);
         return protocolLogPass.msgString;
     }
 
@@ -75,12 +80,28 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
                 return false;
             } else {
                 protoFileSender.sendComand(Comand.AUTH_OK, nick, null);//отправить ответ клиенту авторизован
+                protoFileSender.sendServerStorageList(Comand.SERVER_STORAGE_LiST, getServerStorageList());
                 return true;
             }
         } else {
             protoFileSender.sendComand(Comand.AUTH_NOT_OK, "Неверный логин, пароль!", null);
             return false;
         }
+    }
+    public List<String> getServerStorageList() { // если еще нет каталога с nick
+        if (!Files.exists(Paths.get("1server-storage", nick))) {
+            return null;
+        }
+        List<String> serverStorageList = null;
+        try {
+            serverStorageList = Files.list(Paths.get("1server-storage", nick))
+                    .filter(p -> !Files.isDirectory(p))
+                    .map(p -> p.getFileName().toString())
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return serverStorageList;
     }
 
     private boolean checkUniqueLogAndNick(String log, String pass, String nickNew) throws IOException {

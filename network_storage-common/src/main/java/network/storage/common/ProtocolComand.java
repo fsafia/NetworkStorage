@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 public class ProtocolComand {
     public enum State {IDLE, MSG_LENGHT, MSG}
@@ -19,6 +20,7 @@ public class ProtocolComand {
     private String storage;
     private StringBuffer msgTextSb;
     private String nick;
+    public String serverStorageFiles;
 
     public void setNick(String nick) {
         this.nick = nick;
@@ -40,7 +42,8 @@ public class ProtocolComand {
             if (Comand.DELETE_FILE_FromServer == comand              // 2- удаление с сервера
                     || Comand.RENAME_FILE_FromServer == comand       // 3- переименование
                     || Comand.DOWNLOAD_FILE_TO_CLIENT == comand     // 4 - cкачивание файла
-                    || Comand.AUTH_NOT_OK == comand) {              // 12 - команда не выполнена
+                    || Comand.SERVER_STORAGE_LiST == comand          // 17 - список файлов с сервера
+                    /*|| Comand.AUTH_NOT_OK == comand*/) {              // 12 - команда не выполнена
 
                 currentState = State.MSG_LENGHT;
                 receivedMsgLenght = 0L;
@@ -115,9 +118,13 @@ public class ProtocolComand {
 //    }
 
     }
-    public void defineCmd (byte comand, String sb, Channel channel) throws IOException {
+    public void defineCmd (byte comand, String msg, Channel channel) throws IOException {
+        if (comand == Comand.SERVER_STORAGE_LiST) {
+            serverStorageFiles = msg;
+            return;
+        }
         ProtoFileSender protoFileSender = new ProtoFileSender(channel);
-        String fileName = sb.split(" ")[0];
+        String fileName = msg.split(" ")[0];
         Path storagePath = Paths.get(storage,nick, fileName);
         switch (comand) {
             case Comand.DELETE_FILE_FromServer:
@@ -129,7 +136,7 @@ public class ProtocolComand {
                 }
                 break;
             case Comand.RENAME_FILE_FromServer:
-                String fileNewName = sb.split(" ")[1]; //byte_msgLenght_msg(в виде fileOld.txt_fileNew.txt)
+                String fileNewName = msg.split(" ")[1]; //byte_msgLenght_msg(в виде fileOld.txt_fileNew.txt)
                 Path storagePathNew = Paths.get(storage,nick, fileNewName);
                 Files.move(storagePath, storagePathNew);
                 /////////////////////////////если файлы с такими именами не существуют???
