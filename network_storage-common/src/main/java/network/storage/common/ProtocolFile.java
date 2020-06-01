@@ -91,19 +91,19 @@ public class ProtocolFile {
         return serverPath;
     }
 
-    private void writeFile(ByteBuf buf) throws Exception {
-        while (buf.readableBytes() > 0) {
-            out.write(buf.readByte());
-            receivedFileLenght++;
-            if (fileLenght == receivedFileLenght) {
-                System.out.println("File received");
-                out.close();
-                resetState();
-                break; //return;
-            }
-        }
-        out.flush();
-    }
+//    private void writeFile(ByteBuf buf) throws Exception {
+//        while (buf.readableBytes() > 0) {
+//            out.write(buf.readByte());
+//            receivedFileLenght++;
+//            if (fileLenght == receivedFileLenght) {
+//                System.out.println("File received");
+//                out.close();
+//                resetState();
+//                break; //return;
+//            }
+//        }
+//        out.flush();
+//    }
 
     private void resetState() {
         currentState = State.NAME_LENGHT;

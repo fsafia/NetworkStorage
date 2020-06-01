@@ -3,6 +3,7 @@ package network.storage.client;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import javafx.application.Platform;
 import network.storage.common.Comand;
 import network.storage.common.ProtocolComand;
 import network.storage.common.ProtocolFile;
@@ -20,6 +21,7 @@ public class IncomingMessageHandler extends ChannelInboundHandlerAdapter {
     private Response currentResponse = Response.IDLE;
     private Runnable finishOperation = () -> {
         System.out.println("Файл загружен");
+        Platform.runLater(() -> {c.updateLocalStorage();});
         currentResponse = Response.IDLE;
     };
 

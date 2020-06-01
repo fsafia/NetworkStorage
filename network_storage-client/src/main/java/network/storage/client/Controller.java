@@ -20,12 +20,8 @@ import java.util.stream.Collectors;
 
 
 public class Controller {
-//    @FXML
-//    TextArea textArea;
-
     @FXML
     TextField textFieldClient, textFieldServer;
-
     @FXML
     HBox workPanel;
     @FXML
@@ -36,8 +32,6 @@ public class Controller {
     PasswordField passwordField, signupPasswordField;
     @FXML
     ListView<String> localStorage, serverStorage;
-
-
 
     private boolean isAuthorized;
     private Network network ;
@@ -176,10 +170,6 @@ public class Controller {
 
     public void renameLocalFile(ActionEvent actionEvent)  {
 
-    }
-
-    public String selectItemFromLocalStorage() {
-        return localStorage.getSelectionModel().getSelectedItem();
     }
 
     public void Dispose(){

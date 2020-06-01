@@ -66,18 +66,8 @@ public class ProtocolComand {
                 msgString = getMsgString(buf);
                 defineCmd(comand, msgString, ctx.channel());
                 resetState();
-                    finishOperation.run();
-                    return;
-
-//                while (buf.readableBytes() > 0) {
-//                msgTextSb.append((char) buf.readByte()); // ?
-//                receivedMsgLenght++;
-//                if (msgLenght == receivedMsgLenght) {
-//                    defineCmd(comand, msgTextSb.toString(), ctx.channel());
-//                    resetState();
-//                    finishOperation.run();
-//                    return;
-//                }
+                finishOperation.run();
+                return;
             }
         }
 

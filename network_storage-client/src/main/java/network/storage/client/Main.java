@@ -26,11 +26,6 @@ public class Main extends Application {
             Platform.exit();
             System.exit(0);
         });
-
-//        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-//        primaryStage.setTitle("Chat");
-//        primaryStage.setScene(new Scene(root, 350, 375));
-//        primaryStage.show();
     }
 
 

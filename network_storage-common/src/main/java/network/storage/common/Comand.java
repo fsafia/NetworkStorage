@@ -5,7 +5,6 @@ public class  Comand {
     public static final byte DELETE_FILE_FromServer = (byte)2;
     public static final byte RENAME_FILE_FromServer = (byte)3;
     public static final byte DOWNLOAD_FILE_TO_CLIENT = (byte)4;
-    public static final byte DELETE_FILE_FROM_CLIENT = (byte)5;
     public static final byte RENAME_FILE_TO_CLIENT = (byte)6;
     public static final byte TRY_TO_AUTH = (byte)10;
     public static final byte TRY_TO_SIGNUP = (byte)11;
