@@ -52,8 +52,8 @@ public class IncomingMessageHandler extends ChannelInboundHandlerAdapter {
 
             if (currentResponse == Response.COMAND) {
                 protocolCom.executeComand(ctx, buf,finishOperation);
-                if (protocolCom.serverStorageFiles != null ) {
-                    c.updateServerStorage(protocolCom.serverStorageFiles);
+                if (protocolCom.msgString != null ) {
+                    c.updateServerStorage(protocolCom.msgString);
                 }
             }
         }

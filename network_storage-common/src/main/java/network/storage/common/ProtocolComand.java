@@ -21,6 +21,7 @@ public class ProtocolComand {
     private StringBuffer msgTextSb;
     private String nick;
     public String serverStorageFiles;
+    public String msgString;
 
     public void setNick(String nick) {
         this.nick = nick;
@@ -42,8 +43,7 @@ public class ProtocolComand {
             if (Comand.DELETE_FILE_FromServer == comand              // 2- удаление с сервера
                     || Comand.RENAME_FILE_FromServer == comand       // 3- переименование
                     || Comand.DOWNLOAD_FILE_TO_CLIENT == comand     // 4 - cкачивание файла
-                    || Comand.SERVER_STORAGE_LiST == comand          // 17 - список файлов с сервера
-                    /*|| Comand.AUTH_NOT_OK == comand*/) {              // 12 - команда не выполнена
+                    || Comand.SERVER_STORAGE_LiST == comand) {      // 17 - список файлов с сервера
 
                 currentState = State.MSG_LENGHT;
                 receivedMsgLenght = 0L;
@@ -62,70 +62,39 @@ public class ProtocolComand {
         }
 
         if (currentState == State.MSG) {
-            while (buf.readableBytes() > 0) {
-                msgTextSb.append((char) buf.readByte()); // ?
-                receivedMsgLenght++;
-                if (msgLenght == receivedMsgLenght) {
-                    defineCmd(comand, msgTextSb.toString(), ctx.channel());
-                    resetState();
+            if (buf.readableBytes() >= msgLenght) {
+                msgString = getMsgString(buf);
+                defineCmd(comand, msgString, ctx.channel());
+                resetState();
                     finishOperation.run();
                     return;
-                }
+
+//                while (buf.readableBytes() > 0) {
+//                msgTextSb.append((char) buf.readByte()); // ?
+//                receivedMsgLenght++;
+//                if (msgLenght == receivedMsgLenght) {
+//                    defineCmd(comand, msgTextSb.toString(), ctx.channel());
+//                    resetState();
+//                    finishOperation.run();
+//                    return;
+//                }
             }
         }
 
-//        if (currentState == State.NAME) {
-//            if (buf.readableBytes() >= ) {
-//                String name = getName(buf); //String в виде 1.txt
-//
-//                Path storagePath = getPathOnStorage(name);  //Path в виде "1server-storage/1.txt"
-//
-//                if (Comand.DELETE_FILE_FromServer == comand) {
-//                    if (Files.exists(storagePath)) { //--------------добавить проверку на существование файла и директории
-//                        Files.delete(storagePath);
-//                        System.out.println("Файл " + storagePath + " удален");
-//                    } else {
-//                        System.out.println("Файлa " + storagePath + " нет");
-//                    }
-//                    resetState();
-//                }
-//
-//                if (Comand.RENAME_FILE_FromServer == comand ) {  // 351.txt55.txt -(3команда-5длина старИмени-1.тхт-5длинаНовИмени-5т.хт
-//                    renameFile.add(storagePath);                                     //byteIntNameOldIntNameNew
-//                    if (renameFile.size() == 1) {  //получили Path , renameFile(0)- это старое имя файла
-//                         = 0;
-//                        currentState = State.NAME_LENGHT;
-//                    }
-//                    if (renameFile.size() == 2 && Files.exists(renameFile.get(0)) && !Files.exists(renameFile.get(1))) { //получили новый Path , renameFile(1)- это новое имя файла
-//                        Files.move(renameFile.get(0), renameFile.get(1));       //если старый файл существует, а файла с новым именем не существует -- переименовываем
-//                        resetState();
-//                    }
-//                }
-//                if (Comand.DOWNLOAD_FILE_TO_CLIENT == comand) {
-//                    ctx.write(storagePath);
-//                    resetState();
-//                }
-//            }
-//        }
-//
-//        if (currentState == State.FILE_LENGHT) {
-//            getFileLenght(buf);
-//        }
-//
-//        if (currentState == State.FILE) {
-//            writeFile(buf);
-//        }
-//    }
-
+    }
+    private String getMsgString(ByteBuf buf) throws Exception {
+        byte [] fileName = new byte[msgLenght];
+        buf.readBytes(fileName);
+        String msg = new String(fileName, "UTF-8");
+        return msg;
     }
     public void defineCmd (byte comand, String msg, Channel channel) throws IOException {
         if (comand == Comand.SERVER_STORAGE_LiST) {
-            serverStorageFiles = msg;
             return;
         }
         ProtoFileSender protoFileSender = new ProtoFileSender(channel);
-        String fileName = msg.split(" ")[0];
-        Path storagePath = Paths.get(storage,nick, fileName);
+ //       String fileName = msg.split(" ")[0];
+        Path storagePath = Paths.get(storage,nick, msg);
         switch (comand) {
             case Comand.DELETE_FILE_FromServer:
                 if (Files.exists(storagePath)) {
@@ -139,7 +108,6 @@ public class ProtocolComand {
                 String fileNewName = msg.split(" ")[1]; //byte_msgLenght_msg(в виде fileOld.txt_fileNew.txt)
                 Path storagePathNew = Paths.get(storage,nick, fileNewName);
                 Files.move(storagePath, storagePathNew);
-                /////////////////////////////если файлы с такими именами не существуют???
                 break;
             case Comand.DOWNLOAD_FILE_TO_CLIENT:
                 if (Files.exists(storagePath)) {
@@ -151,7 +119,6 @@ public class ProtocolComand {
     private void resetState () {
         currentState = State.IDLE;
         msgLenght = 0;
-        receivedMsgLenght = 0L;
-        //comand = (byte) 0;
+        //receivedMsgLenght = 0L;
     }
 }
