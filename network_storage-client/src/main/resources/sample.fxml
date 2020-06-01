@@ -10,8 +10,10 @@
 <?import javafx.scene.control.PasswordField?>
 
 <?import javafx.scene.control.ListView?>
-<VBox fx:id="boxArea" fx:controller="network.storage.client.Controller" xmlns:fx="http://javafx.com/fxml" alignment="center">
-    <HBox fx:id="upperPanel">
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.Menu?>
+<HBox fx:id="boxArea" fx:controller="network.storage.client.Controller" xmlns:fx="http://javafx.com/fxml" alignment="center">
+    <HBox fx:id="authPanel">
 
         <VBox HBox.hgrow="ALWAYS" >
             <TextField fx:id="loginField" promptText="Логин"  />
@@ -31,28 +33,53 @@
     </HBox>
 
 
-    <HBox VBox.vgrow="ALWAYS">
-        <VBox HBox.hgrow="ALWAYS">
-            <TextArea fx:id="textArea" editable="false" VBox.vgrow="ALWAYS"/>
-            <VBox fx:id="bottomPanel" managed="false" visible="false">
-                <TextField fx:id="textField" HBox.hgrow="ALWAYS" editable="false" promptText="Имя файла" />
-                <Button fx:id="btn1" text="send"/>
-                <Button  text="send file to server" onAction="#sendFileToServer"/>
-                <Button  text="download to client" onAction="#downloadToClient"/>
-                <Button  text="delete remote file" onAction="#deleteRemoteFile"/>
-                <Button  text="delete local file" onAction="#deleteLocalFile"/>
-                <Button  text="rename remote file" onAction="#sendMsg"/>
-                <Button  text="rename local file" onAction="#sendMsg"/>
+    <!--<HBox VBox.vgrow="ALWAYS">-->
+        <!--<VBox HBox.hgrow="ALWAYS">-->
+            <!--&lt;!&ndash;<TextArea fx:id="textArea" editable="false" VBox.vgrow="ALWAYS"/>&ndash;&gt;-->
+            <!--<HBox fx:id="workPanel" managed="false" visible="false">-->
+                <!--<TextField fx:id="textField" HBox.hgrow="ALWAYS" editable="false" promptText="Имя файла" />-->
+                <!--<Button fx:id="btn1" text="send"/>-->
+                <!--<Button  text="send file to server" onAction="#sendFileToServer"/>-->
+                <!--<Button  text="download to client" onAction="#downloadToClient"/>-->
+                <!--<Button  text="delete remote file" onAction="#deleteRemoteFile"/>-->
+                <!--<Button  text="delete local file" onAction="#deleteLocalFile"/>-->
+                <!--<Button  text="rename remote file" onAction="#sendMsg"/>-->
+                <!--<Button  text="rename local file" onAction="#sendMsg"/>-->
 
-            </VBox>
+            <!--</HBox>-->
+        <!--</VBox>-->
+        <!--<ListView fx:id="localStorage" managed="false" prefWidth="300" />-->
+        <!--<ListView fx:id="serverStorage" managed="false"  prefWidth="300" />-->
+    <!--</HBox>-->
+
+
+
+    <HBox fx:id="workPanel" managed="false" visible="false">
+        <VBox fx:id="client">
+            <MenuBar>
+                <Menu text="client storage"></Menu>
+            </MenuBar>
+            <ListView fx:id="localStorage" prefWidth="300" />
+            <TextField fx:id="textFieldClient" HBox.hgrow="ALWAYS" promptText="Имя файла" />
+            <Button text="send file to server" onAction="#sendFileToServer"/>
+            <Button  text="delete local file" onAction="#deleteLocalFile"/>
+            <Button  text="rename local file" onAction="#sendMsg"/>
+
         </VBox>
-        <ListView fx:id="localStorage" managed="false" prefWidth="300" />
-        <ListView fx:id="serverStorage" managed="false"  prefWidth="300" />
-
+        <VBox fx:id="server">
+            <MenuBar>
+                <Menu text="server storage"></Menu>
+            </MenuBar>
+            <ListView fx:id="serverStorage" prefWidth="300" />
+            <TextField fx:id="textFieldServer" HBox.hgrow="ALWAYS" promptText="Имя файла" />
+            <Button  text="download to client" onAction="#downloadToClient"/>
+            <Button  text="delete remote file" onAction="#deleteRemoteFile"/>
+            <Button  text="rename remote file" onAction="#sendMsg"/>
+        </VBox>
     </HBox>
 
 
-</VBox>
+</HBox>
 <!--<GridPane fx:controller="sample.Controller"-->
           <!--xmlns:fx="http://javafx.com/fxml" alignment="center" hgap="10" vgap="10">-->
 <!--</GridPane>-->

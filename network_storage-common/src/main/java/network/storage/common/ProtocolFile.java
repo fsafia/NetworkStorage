@@ -29,25 +29,6 @@ public class ProtocolFile {
 
     public void writeFile(ChannelHandlerContext ctx, ByteBuf buf, String nik, Runnable finishOperation) throws Exception{
 
-//            if(currentState == State.IDLE) {
-//                comand = buf.readByte();
-//                if (Comand.CLIENT_CLOSE == comand) { // 15- клиент отключился
-//
-//                }
-//                if (Comand.WRITE_FILE == comand                   // 1-команда для записи файла на сервер
-//                    || Comand.DELETE_FILE_FromServer == comand    // 2- удаление с сервера
-//                    || Comand.RENAME_FILE_FromServer == comand    // 3- переименование
-//                    || Comand.DOWNLOAD_FILE_TO_CLIENT == comand ) {   // 4 - cкачивание файла
-//
-//                    currentState = State.NAME_LENGHT;
-//                    receivedFileLenght = 0L;
-//                    renameFile = new ArrayList<>(2);
-//                    System.out.println("STATE: Start file receiving");
-//                } else {
-//                    System.out.println("другую команду");
-//                }
-//            }
-
             if (currentState == State.NAME_LENGHT) {
                 if (buf.readableBytes() >= 4) {  // считывает int
                     System.out.println("STATE: GET filename lenght");

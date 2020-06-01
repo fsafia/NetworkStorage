@@ -1,20 +1,25 @@
 package network.storage.server;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import network.storage.common.Comand;
+import network.storage.common.ProtoFileSender;
 import network.storage.common.ProtocolComand;
 import network.storage.common.ProtocolFile;
 
 public class ProtoHandler extends ChannelInboundHandlerAdapter {
     ProtocolFile protocol;
     ProtocolComand protocolCom;
+    private String nickName;
+    private ProtoFileSender protoFileSender;
+    private AuthHandler authHandler;
     private Runnable finishOperation = () -> {
         System.out.println("Файл загружен");
-        currentRequest = Request.IDLE;//////////////////добавить обновление списка файлов?
+        protoFileSender.sendServerStorageList(Comand.SERVER_STORAGE_LiST, authHandler.getServerStorageList());
+        currentRequest = Request.IDLE;
     };
-
     ProtoHandler() {
         protocol = new ProtocolFile("1server-storage");
         protocolCom = new ProtocolComand("1server-storage");
@@ -26,16 +31,21 @@ public class ProtoHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        if (nickName == null) {  //клиент только что авторизовался
+            authHandler = ctx.pipeline().get(AuthHandler.class);
+            nickName = authHandler.getNick();
+            protocolCom.setNick(nickName);
+            protoFileSender = new ProtoFileSender(ctx.channel());
+        }
+
         ByteBuf buf = (ByteBuf) msg;
-        AuthHandler authHandler = ctx.pipeline().get(AuthHandler.class);
-        protocolCom.setNick(authHandler.getNick());//передает ник каждый раз
 
         while (buf.readableBytes() > 0) {
             if (currentRequest == Request.IDLE) {
                 byte comand = buf.readByte();
                 if (comand == Comand.CLIENT_CLOSE) { //если user  авторизовался и закрыл соединение
                     ctx.close();
-                    AuthService.getUserList().remove(authHandler.getNick());
+                    AuthService.getUserList().remove(nickName);
                 } else if (comand == Comand.WRITE_FILE) {
                     currentRequest = Request.FILE;
                 } else {
@@ -45,7 +55,9 @@ public class ProtoHandler extends ChannelInboundHandlerAdapter {
             }
 
             if (currentRequest == Request.FILE) {
-                protocol.writeFile(ctx, buf, authHandler.getNick(), finishOperation);
+                protocol.writeFile(ctx, buf, nickName, finishOperation);
+//                ProtoFileSender protoFileSender = new ProtoFileSender(ctx.channel());
+//                protoFileSender.sendServerStorageList(Comand.SERVER_STORAGE_LiST, authHandler.getServerStorageList());
             }
 
             if (currentRequest == Request.COMAND) {

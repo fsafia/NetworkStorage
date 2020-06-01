@@ -136,36 +136,4 @@ public class ProtoFileSender {
 //            }
 
     }
-
-//        if (comand == Comand.DELETE_FILE_FromClient && Files.exists(storagePath)) {
-//            Files.delete(storagePath);
-//            return;
-//        }
-//
-//        byte[] filenameBytes = storagePath.getFileName().toString().getBytes(StandardCharsets.UTF_8);
-//        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1 + 4 + filenameBytes.length );
-//        buf.writeByte(comand.getNumberComand());
-//        buf.writeInt(filenameBytes.length);
-//        buf.writeBytes(filenameBytes);
-//
-//        switch (comand) {
-//            case WRITE_FILE:
-//                ctx.write(buf);
-//                buf = ByteBufAllocator.DEFAULT.directBuffer(8);
-//                buf.writeLong(Files.size(storagePath));
-//                ctx.writeAndFlush(buf);
-//                FileRegion region = new DefaultFileRegion(storagePath.toFile(), 0, Files.size(storagePath));
-//                ChannelFuture transferOperationFuture = ctx.writeAndFlush(region);
-//                if (finishListener != null) {
-//                    transferOperationFuture.addListener(finishListener);
-//                }
-//                break;
-//            case DELETE_FILE_FromServer:
-//                ctx.writeAndFlush(buf);
-//                break;
-//            case DOWNLOAD_FILE_ToClient:
-//                ctx.writeAndFlush(buf);
-//                break;
-//        }
-//    }
 }

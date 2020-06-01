@@ -22,16 +22,16 @@ import java.util.stream.Collectors;
 
 
 public class Controller {
-    @FXML
-    TextArea textArea;
+//    @FXML
+//    TextArea textArea;
 
     @FXML
-    TextField textField;
+    TextField textFieldClient, textFieldServer;
 
     @FXML
-    VBox bottomPanel;
+    HBox workPanel;
     @FXML
-    HBox upperPanel;
+    HBox authPanel;
     @FXML
     TextField loginField, signupLoginField, signupNickField;
     @FXML
@@ -54,99 +54,54 @@ public class Controller {
     public void setAuthorized(boolean isAuthorized){
         this.isAuthorized = isAuthorized;
         if(!isAuthorized){
-            textArea.clear();
-            upperPanel.setVisible(true);
-            upperPanel.setManaged(true);
-            bottomPanel.setVisible(false);
-            bottomPanel.setManaged(false);
-            localStorage.setVisible(false);
-            localStorage.setManaged(false);
-            serverStorage.setVisible(false);
-            serverStorage.setManaged(false);
+            //
+            authPanel.setVisible(true);
+            authPanel.setManaged(true);
+            workPanel.setVisible(false);
+            workPanel.setManaged(false);
+
+//            authPanel.setVisible(true);
+//            authPanel.setManaged(true);
+//            workPanel.setVisible(false);
+//            workPanel.setManaged(false);
+//            localStorage.setVisible(false);
+//            localStorage.setManaged(false);
+//            serverStorage.setVisible(false);
+//            serverStorage.setManaged(false);
         } else {
-            textArea.clear();
-            upperPanel.setVisible(false);
-            upperPanel.setManaged(false);
-            bottomPanel.setVisible(true);
-            bottomPanel.setManaged(true);
-            localStorage.setVisible(true);
-            localStorage.setManaged(true);
-            serverStorage.setVisible(true);
-            serverStorage.setManaged(true);
+            //
+            authPanel.setVisible(false);
+            authPanel.setManaged(false);
+            workPanel.setVisible(true);
+            workPanel.setManaged(true);
+
+
+//            authPanel.setVisible(false);
+//            authPanel.setManaged(false);
+//            workPanel.setVisible(true);
+//            workPanel.setManaged(true);
+//            localStorage.setVisible(true);
+//            localStorage.setManaged(true);
+//            serverStorage.setVisible(true);
+//            serverStorage.setManaged(true);
 
             localStorage.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent event) {
-                    textField.clear();
-                    textField.setText(localStorage.getSelectionModel().getSelectedItem());
+                    textFieldClient.clear();
+                    textFieldClient.setText(localStorage.getSelectionModel().getSelectedItem());
+                }
+            });
+
+            serverStorage.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    textFieldServer.clear();
+                    textFieldServer.setText(serverStorage.getSelectionModel().getSelectedItem());
                 }
             });
         }
     }
-
-
-//    public void connect() {
-//        try {
-//            new Thread(() -> {
-//                    try {
-//                        while (true){
-//                            String str = in.readUTF();
-//                            if (str.equals("/authok")){
-//                                setAuthorized(true);
-//                                break;
-//                            } else {
-////                                for (TextArea o : textAreas){
-////                                    o.appendText(str + "\n");
-////                                }
-//                               textArea.appendText(str + "\n");
-//                            }
-//                        }
-//
-//
-//                        while (true){
-//                            String str = in.readUTF();
-//                            if (str.startsWith("/")){
-//                                if (str.equals("/serverClosed")) break;
-//                                if (str.startsWith("/clientslist ")){
-//                                    String[] tokens = str.split(" ");
-//                                    Platform.runLater(() -> {
-//                                        clientsList.getItems().clear();
-//                                        for (int i = 1; i < tokens.length; i++) {
-//                                            clientsList.getItems().add(tokens[i]);
-//                                        }
-//                                    });
-//                                }
-//                                if (str.startsWith("/blacklist ")){
-//                                    String[] tokens = str.split(" ");
-//                                    Platform.runLater(() -> {
-//                                        clientsBlockList.getItems().clear();
-//                                        for (int i = 1; i < tokens.length; i++) {
-//                                            clientsBlockList.getItems().add(tokens[i]);
-//                                        }
-//                                    });
-//                                }
-//                            }else{
-//                                textArea.appendText(str + "\n");
-//                            }
-//
-//
-//                        }
-//                    }catch (IOException e) {
-//                        e.printStackTrace();
-//                    }finally {
-//                        try {
-//                            socket.close();
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//                        setAuthorized(false);
-//                    }
-//                }
-//            ).start();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     public void connect() throws InterruptedException {
         CountDownLatch networkStarter = new CountDownLatch(1);
@@ -197,23 +152,23 @@ public class Controller {
     }
 
     public void deleteRemoteFile (ActionEvent actionEvent) throws IOException {
-        protoFileSender.sendComand(Comand.DELETE_FILE_FromServer, textField.getText(), null);
-        textField.clear();
+        protoFileSender.sendComand(Comand.DELETE_FILE_FromServer, textFieldServer.getText(), null);
+        textFieldServer.clear();
     }
 
     public void deleteLocalFile (ActionEvent actionEvent) throws IOException {
-        Files.delete(Paths.get("1client-storage", textField.getText()));
-        textField.clear();
+        Files.delete(Paths.get("1client-storage", textFieldClient.getText()));
+        textFieldClient.clear();
         updateLocalStorage();
     }
 
     public void sendFileToServer (ActionEvent actionEvent) throws IOException {
-        protoFileSender.sendFile(Paths.get("1client-storage", textField.getText()), null);
-        textField.clear();
+        protoFileSender.sendFile(Paths.get("1client-storage", textFieldClient.getText()), null);
+        textFieldClient.clear();
     }
     public void downloadToClient (ActionEvent actionEvent) throws IOException {
-        protoFileSender.sendComand(Comand.DOWNLOAD_FILE_TO_CLIENT, textField.getText(), null);
-        textField.clear();
+        protoFileSender.sendComand(Comand.DOWNLOAD_FILE_TO_CLIENT, textFieldServer.getText(), null);
+        textFieldServer.clear();
     }
 
     public void authResponse(byte comand, String response) throws IOException {
