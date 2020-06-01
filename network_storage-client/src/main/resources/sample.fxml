@@ -44,7 +44,7 @@
                 <Menu text="client storage" />
             </MenuBar>
             <ListView fx:id="localStorage" prefWidth="300" />
-            <TextField fx:id="textFieldClient" promptText="Имя файла" HBox.hgrow="ALWAYS" />
+            <TextField fx:id="textFieldClient" promptText="Имя файла" editable="false" HBox.hgrow="ALWAYS" />
             <Button alignment="CENTER" maxWidth="Infinity" onAction="#sendFileToServer" text="send file to server" />
             <Button alignment="CENTER" maxWidth="Infinity" onAction="#deleteLocalFile" text="delete local file" />
             <Button alignment="CENTER" maxWidth="Infinity" onAction="#renameLocalFile" text="rename local file" />
@@ -55,7 +55,7 @@
                 <Menu text="server storage" />
             </MenuBar>
             <ListView fx:id="serverStorage" prefWidth="300" />
-            <TextField fx:id="textFieldServer" promptText="Имя файла" HBox.hgrow="ALWAYS" />
+            <TextField fx:id="textFieldServer" promptText="Имя файла" editable="false" HBox.hgrow="ALWAYS" />
             <Button alignment="CENTER" maxWidth="Infinity" onAction="#downloadToClient" text="download to client"/>
             <Button alignment="CENTER" maxWidth="Infinity" onAction="#deleteRemoteFile" text="delete remote file" />
             <Button alignment="CENTER" maxWidth="Infinity" onAction="#renameLocalFile" text="rename remote file" />

@@ -92,7 +92,7 @@ public class Controller {
         }
 
         String authString = loginField.getText() + " " + passwordField.getText();
-        protoFileSender.sendComand(Comand.TRY_TO_AUTH, authString, null);
+        protoFileSender.sendComand(Comand.TRY_TO_AUTH, authString/*, null*/);
         loginField.clear();
         passwordField.clear();
     }
@@ -102,14 +102,14 @@ public class Controller {
             connect();
         }
         String signupString = signupLoginField.getText() + " " + signupPasswordField.getText() + " " + signupNickField.getText();
-        protoFileSender.sendComand(Comand.TRY_TO_SIGNUP, signupString, null);
+        protoFileSender.sendComand(Comand.TRY_TO_SIGNUP, signupString/*, null*/);
         signupLoginField.clear();
         signupPasswordField.clear();
         signupNickField.clear();
     }
 
     public void deleteRemoteFile (ActionEvent actionEvent) throws IOException {
-        protoFileSender.sendComand(Comand.DELETE_FILE_FromServer, textFieldServer.getText(), null);
+        protoFileSender.sendComand(Comand.DELETE_FILE_FromServer, textFieldServer.getText()/*, null*/);
         textFieldServer.clear();
     }
 
@@ -124,7 +124,7 @@ public class Controller {
         textFieldClient.clear();
     }
     public void downloadToClient (ActionEvent actionEvent) throws IOException {
-        protoFileSender.sendComand(Comand.DOWNLOAD_FILE_TO_CLIENT, textFieldServer.getText(), null);
+        protoFileSender.sendComand(Comand.DOWNLOAD_FILE_TO_CLIENT, textFieldServer.getText()/*, null*/);
         textFieldServer.clear();
     }
 
@@ -169,7 +169,7 @@ public class Controller {
     }
 
     public void renameLocalFile(ActionEvent actionEvent)  {
-
+        String oldName = textFieldClient.getText();
     }
 
     public void Dispose(){

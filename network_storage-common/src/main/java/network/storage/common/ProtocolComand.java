@@ -8,28 +8,21 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 
 public class ProtocolComand {
     public enum State {IDLE, MSG_LENGHT, MSG}
 
     public State currentState = State.IDLE;
     private int msgLenght;
-    private long receivedMsgLenght;
     private byte comand;
     private String storage;
-    private StringBuffer msgTextSb;
     private String nick;
-    public String serverStorageFiles;
     public String msgString;
 
     public void setNick(String nick) {
         this.nick = nick;
     }
 
-    public StringBuffer getMsgTextSb() {
-        return msgTextSb;
-    }
     public void setComand(byte comand) {
         this.comand = comand;
     }
@@ -46,11 +39,9 @@ public class ProtocolComand {
                     || Comand.SERVER_STORAGE_LiST == comand) {      // 17 - список файлов с сервера
 
                 currentState = State.MSG_LENGHT;
-                receivedMsgLenght = 0L;
-                msgTextSb = new StringBuffer();
                 System.out.println("STATE: Start comand receiving");
             } else {
-                System.out.println("отправьте другую команду");
+                System.out.println("неверная команду");
             }
         }
 
@@ -83,7 +74,6 @@ public class ProtocolComand {
             return;
         }
         ProtoFileSender protoFileSender = new ProtoFileSender(channel);
- //       String fileName = msg.split(" ")[0];
         Path storagePath = Paths.get(storage,nick, msg);
         switch (comand) {
             case Comand.DELETE_FILE_FromServer:
@@ -109,6 +99,5 @@ public class ProtocolComand {
     private void resetState () {
         currentState = State.IDLE;
         msgLenght = 0;
-        //receivedMsgLenght = 0L;
     }
 }
