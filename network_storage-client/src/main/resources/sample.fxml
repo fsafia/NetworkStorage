@@ -11,6 +11,7 @@
 <?scenebuilder--stylesheet /css/Styles.css?>
 
 
+<?import javafx.scene.shape.Box?>
 <HBox fx:id="boxArea" alignment="center" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="network.storage.client.Controller">
     <VBox fx:id="authPanel">
         <VBox VBox.vgrow="ALWAYS"  HBox.hgrow="ALWAYS" />
@@ -47,7 +48,17 @@
             <TextField fx:id="textFieldClient" promptText="Имя файла" editable="false" HBox.hgrow="ALWAYS" />
             <Button alignment="CENTER" maxWidth="Infinity" onAction="#sendFileToServer" text="send file to server" />
             <Button alignment="CENTER" maxWidth="Infinity" onAction="#deleteLocalFile" text="delete local file" />
-            <Button alignment="CENTER" maxWidth="Infinity" onAction="#renameLocalFile" text="rename local file" />
+            <Button fx:id="buttonRenameFileClient" alignment="CENTER" maxWidth="Infinity" onAction="#renameLocalFile" text="rename local file" />
+            <VBox fx:id="panelRenameFileClient" HBox.hgrow="ALWAYS" managed="false" visible="false">
+                <HBox>
+                    <TextField fx:id="textFieldnewNameClient" promptText="введите новое имя"/>
+                    <Button text="Rename" onAction="#renameClientOk"/>
+                    <Button text="Cansel" onAction="#cancel"/>
+                </HBox>
+
+            </VBox>
+
+
 
         </VBox>
         <VBox fx:id="server" spacing="5">
@@ -58,7 +69,7 @@
             <TextField fx:id="textFieldServer" promptText="Имя файла" editable="false" HBox.hgrow="ALWAYS" />
             <Button alignment="CENTER" maxWidth="Infinity" onAction="#downloadToClient" text="download to client"/>
             <Button alignment="CENTER" maxWidth="Infinity" onAction="#deleteRemoteFile" text="delete remote file" />
-            <Button alignment="CENTER" maxWidth="Infinity" onAction="#renameLocalFile" text="rename remote file" />
+            <Button alignment="CENTER" maxWidth="Infinity" onAction="#renameRemoteFile" text="rename remote file" />
         </VBox>
       <HBox.margin>
          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

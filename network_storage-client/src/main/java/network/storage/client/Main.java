@@ -18,7 +18,7 @@ public class Main extends Application {
         primaryStage.setTitle("Storage");
         c = loader.getController();
 
-        Scene scene = new Scene(root, 510, 350);
+        Scene scene = new Scene(root, 650, 350);
         primaryStage.setScene(scene);
         primaryStage.show();
         primaryStage.setOnCloseRequest(event -> {

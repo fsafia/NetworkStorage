@@ -21,23 +21,27 @@ import java.util.stream.Collectors;
 
 public class Controller {
     @FXML
-    TextField textFieldClient, textFieldServer;
+    TextField textFieldClient, textFieldServer, textFieldnewNameClient;
     @FXML
     HBox workPanel;
     @FXML
-    VBox authPanel;
+    VBox authPanel, panelRenameFileClient;
     @FXML
     TextField loginField, signupLoginField, signupNickField;
     @FXML
     PasswordField passwordField, signupPasswordField;
     @FXML
     ListView<String> localStorage, serverStorage;
+    @FXML
+    Button buttonRenameFileClient;
 
     private boolean isAuthorized;
     private Network network ;
     private ChannelHandlerContext context;
     private Channel channel;
     ProtoFileSender protoFileSender;
+    private String oldNameClient;
+    private String newNameClient;
 
     public boolean getIsAuthorized() {
         return isAuthorized;
@@ -109,21 +113,33 @@ public class Controller {
     }
 
     public void deleteRemoteFile (ActionEvent actionEvent) throws IOException {
+        if (isFileNotSelected(textFieldServer, "Выберите файл для удаления.")) {
+            return;
+        }
         protoFileSender.sendComand(Comand.DELETE_FILE_FromServer, textFieldServer.getText()/*, null*/);
         textFieldServer.clear();
     }
 
     public void deleteLocalFile (ActionEvent actionEvent) throws IOException {
+        if (isFileNotSelected(textFieldClient, "Выберите файл для удаления.")) {
+            return;
+        }
         Files.delete(Paths.get("1client-storage", textFieldClient.getText()));
         textFieldClient.clear();
         updateLocalStorage();
     }
 
     public void sendFileToServer (ActionEvent actionEvent) throws IOException {
+        if (isFileNotSelected(textFieldClient, "Выберите файл для отправки.")) {
+            return;
+        }
         protoFileSender.sendFile(Paths.get("1client-storage", textFieldClient.getText()), null);
         textFieldClient.clear();
     }
     public void downloadToClient (ActionEvent actionEvent) throws IOException {
+        if (isFileNotSelected(textFieldServer, "Выберите файл для отправки.")) {
+            return;
+        }
         protoFileSender.sendComand(Comand.DOWNLOAD_FILE_TO_CLIENT, textFieldServer.getText()/*, null*/);
         textFieldServer.clear();
     }
@@ -168,8 +184,53 @@ public class Controller {
         }
     }
 
-    public void renameLocalFile(ActionEvent actionEvent)  {
-        String oldName = textFieldClient.getText();
+    public void renameLocalFile(ActionEvent actionEvent) {
+        if (isFileNotSelected(textFieldClient, "Выберите файл для переименования.")) {
+            return;
+        }
+        oldNameClient = textFieldClient.getText();
+        renamePanelAclive();
+    }
+
+    public void renameClientOk(ActionEvent actionEvent) throws IOException {
+        if (isFileNotSelected(textFieldnewNameClient, "Введите новое имя файла.")) {
+            return;
+        }
+        newNameClient = textFieldnewNameClient.getText();
+        Files.move(Paths.get("1client-storage",oldNameClient), Paths.get("1client-storage", newNameClient));
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, oldNameClient+ " успешно переименован в " + newNameClient, ButtonType.OK);
+        alert.setHeaderText(null);
+        alert.showAndWait();
+        updateLocalStorage();
+        renamePanelInAclive();
+
+    }
+
+    private boolean isFileNotSelected(TextField textField, String info) {
+        if (textField.getText().equals("")) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, info, ButtonType.OK);
+            alert.setHeaderText(null);
+            alert.showAndWait();
+            return true;
+        } else return false;
+    }
+
+
+    private void renamePanelAclive() {
+        buttonRenameFileClient.setManaged(false);
+        buttonRenameFileClient.setVisible(false);
+        panelRenameFileClient.setVisible(true);
+        panelRenameFileClient.setManaged(true);
+    }
+    private void renamePanelInAclive() {
+        buttonRenameFileClient.setManaged(true);
+        buttonRenameFileClient.setVisible(true);
+        panelRenameFileClient.setVisible(false);
+        panelRenameFileClient.setManaged(false);
+    }
+
+    public void cancel(ActionEvent actionEvent) {
+        renamePanelInAclive();
     }
 
     public void Dispose(){
@@ -177,5 +238,9 @@ public class Controller {
         if(channel != null ){
             protoFileSender.sendClose(Comand.CLIENT_CLOSE);
         }
+    }
+
+    public void renameRemoteFile(ActionEvent actionEvent) {
+        // еще не дописано переименование файла на сервере
     }
 }
