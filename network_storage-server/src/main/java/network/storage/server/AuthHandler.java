@@ -34,7 +34,7 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
                 return;
             }
 
-            String msgString = getMsgFromClient(cmd, ctx, bufMsg); // приходит сообщение в виде: log1_pass1
+            String msgString = getMsgFromClient(bufMsg); // приходит сообщение в виде: log1_pass1
             String log = msgString.split(" ")[0];
             String pass = msgString.split(" ")[1];
 
@@ -68,8 +68,8 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
         ctx.close();
     }
 
-    public String getMsgFromClient(byte comand, ChannelHandlerContext ctx, ByteBuf bufMsg) throws Exception {
-        protocolLogPass.executeComand(/*comand, ctx,*/ bufMsg);
+    public String getMsgFromClient(ByteBuf bufMsg) throws Exception {
+        protocolLogPass.executeComand( bufMsg);
         return protocolLogPass.msgString;
     }
 

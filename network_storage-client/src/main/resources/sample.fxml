@@ -41,7 +41,7 @@
     <HBox fx:id="workPanel" managed="false" visible="false">
         <VBox fx:id="client" spacing="5">
             <MenuBar>
-                <Menu text="client storage" />
+                <Menu text="client storage"/>
             </MenuBar>
             <ListView fx:id="localStorage" prefWidth="300" />
             <TextField fx:id="textFieldClient" promptText="Имя файла" editable="false" HBox.hgrow="ALWAYS" />

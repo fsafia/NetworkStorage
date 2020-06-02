@@ -2,14 +2,12 @@ package network.storage.common;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.util.concurrent.FutureListener;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 
 public class ProtocolFile {
 
@@ -31,7 +29,6 @@ public class ProtocolFile {
 
             if (currentState == State.NAME_LENGHT) {
                 if (buf.readableBytes() >= 4) {  // считывает int
-                    System.out.println("STATE: GET filename lenght");
                     nameLenght = buf.readInt();
                     currentState = State.NAME;
                 }
@@ -53,7 +50,6 @@ public class ProtocolFile {
             if (currentState == State.FILE_LENGHT) {
                 if (buf.readableBytes() >= 8) {
                     fileLenght = buf.readLong();
-                    System.out.println("STATE: File lenght received - " + fileLenght);
                     currentState = State.FILE;
                 }
             }
@@ -79,7 +75,6 @@ public class ProtocolFile {
             Files.createDirectory(Paths.get(storage,nick));
         }
         newFile = Files.createFile(storagePath);
-        System.out.println("STATE Filename received - " + storagePath.getFileName());
         currentState = State.FILE_LENGHT;
         out = new BufferedOutputStream(new FileOutputStream( newFile.toString()));
     }
@@ -91,26 +86,12 @@ public class ProtocolFile {
         return serverPath;
     }
 
-//    private void writeFile(ByteBuf buf) throws Exception {
-//        while (buf.readableBytes() > 0) {
-//            out.write(buf.readByte());
-//            receivedFileLenght++;
-//            if (fileLenght == receivedFileLenght) {
-//                System.out.println("File received");
-//                out.close();
-//                resetState();
-//                break; //return;
-//            }
-//        }
-//        out.flush();
-//    }
-
     private void resetState() {
         currentState = State.NAME_LENGHT;
         nameLenght = 0;
         fileLenght = 0L;
         receivedFileLenght = 0L;
-        FileOutputStream out = null;
+        FileOutputStream out = null; //
         newFile = null;
     }
 
