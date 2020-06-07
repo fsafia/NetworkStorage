@@ -41,7 +41,8 @@ public class ProtocolComand {
                 currentState = State.MSG_LENGHT;
                 System.out.println("STATE: Start comand receiving");
             } else {
-                System.out.println("неверная команду");
+                System.out.println("неверная командa");
+                throw new RuntimeException("неверная команда");
             }
         }
 
@@ -85,9 +86,11 @@ public class ProtocolComand {
                 }
                 break;
             case Comand.RENAME_FILE_FromServer:
-                String fileNewName = msg.split(" ")[1]; //byte_msgLenght_msg(в виде fileOld.txt_fileNew.txt)
+                String fileOldName = msg.split("   ")[0];
+                String fileNewName = msg.split("   ")[1];
+                Path storagePathOld = Paths.get(storage,nick, fileOldName);
                 Path storagePathNew = Paths.get(storage,nick, fileNewName);
-                Files.move(storagePath, storagePathNew);
+                Files.move(storagePathOld, storagePathNew);
                 break;
             case Comand.DOWNLOAD_FILE_TO_CLIENT:
                 if (Files.exists(storagePath)) {

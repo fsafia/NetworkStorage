@@ -20,7 +20,6 @@ public class ServerNetty {
                     .channel(NioServerSocketChannel.class) // указание канала для подключения новых клиентов
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
- //                           socketChannel.pipeline().addLast(new SendFileHandler(), new AuthHandler(), new ProtoHandler());
                             socketChannel.pipeline().addLast(new AuthHandler(), new ProtoHandler());
                         }
                     });

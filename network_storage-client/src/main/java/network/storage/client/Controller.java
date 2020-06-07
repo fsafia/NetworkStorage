@@ -21,11 +21,11 @@ import java.util.stream.Collectors;
 
 public class Controller {
     @FXML
-    TextField textFieldClient, textFieldServer, textFieldnewNameClient;
+    TextField textFieldClient, textFieldServer, textFieldnewNameClient, textFieldnewNameServer;
     @FXML
     HBox workPanel;
     @FXML
-    VBox authPanel, panelRenameFileClient;
+    VBox authPanel, panelRenameFileClient, panelRenameFileServer;
     @FXML
     TextField loginField, signupLoginField, signupNickField;
     @FXML
@@ -33,15 +33,15 @@ public class Controller {
     @FXML
     ListView<String> localStorage, serverStorage;
     @FXML
-    Button buttonRenameFileClient;
+    Button buttonRenameFileClient, buttonRenameFileServer;
 
     private boolean isAuthorized;
     private Network network ;
     private ChannelHandlerContext context;
     private Channel channel;
     ProtoFileSender protoFileSender;
-    private String oldNameClient;
-    private String newNameClient;
+    private String oldNameClient, oldNameServer;
+    private String newNameClient, newNameServer;
 
     public boolean getIsAuthorized() {
         return isAuthorized;
@@ -189,7 +189,7 @@ public class Controller {
             return;
         }
         oldNameClient = textFieldClient.getText();
-        renamePanelAclive();
+        renamePanelAclive(buttonRenameFileClient , panelRenameFileClient);
     }
 
     public void renameClientOk(ActionEvent actionEvent) throws IOException {
@@ -202,8 +202,8 @@ public class Controller {
         alert.setHeaderText(null);
         alert.showAndWait();
         updateLocalStorage();
-        renamePanelInAclive();
-
+        renamePanelInAclive(buttonRenameFileClient, panelRenameFileClient);
+        textFieldClient.clear();
     }
 
     private boolean isFileNotSelected(TextField textField, String info) {
@@ -216,21 +216,30 @@ public class Controller {
     }
 
 
-    private void renamePanelAclive() {
-        buttonRenameFileClient.setManaged(false);
-        buttonRenameFileClient.setVisible(false);
-        panelRenameFileClient.setVisible(true);
-        panelRenameFileClient.setManaged(true);
+    private void renamePanelAclive(Button button, VBox renamePanel) {
+        button.setManaged(false);
+        button.setVisible(false);
+        renamePanel.setVisible(true);
+        renamePanel.setManaged(true);
+//        buttonRenameFileClient.setManaged(false);
+//        buttonRenameFileClient.setVisible(false);
+//        panelRenameFileClient.setVisible(true);
+//        panelRenameFileClient.setManaged(true);
     }
-    private void renamePanelInAclive() {
-        buttonRenameFileClient.setManaged(true);
-        buttonRenameFileClient.setVisible(true);
-        panelRenameFileClient.setVisible(false);
-        panelRenameFileClient.setManaged(false);
+    private void renamePanelInAclive(Button button, VBox renamePanel) {
+        button.setManaged(true);
+        button.setVisible(true);
+        renamePanel.setVisible(false);
+        renamePanel.setManaged(false);
+//        buttonRenameFileClient.setManaged(true);
+//        buttonRenameFileClient.setVisible(true);
+//        panelRenameFileClient.setVisible(false);
+//        panelRenameFileClient.setManaged(false);
     }
 
-    public void cancel(ActionEvent actionEvent) {
-        renamePanelInAclive();
+    public void cancelClient(ActionEvent actionEvent) {
+        renamePanelInAclive(buttonRenameFileClient, panelRenameFileClient);
+        textFieldClient.clear();
     }
 
     public void Dispose(){
@@ -241,6 +250,25 @@ public class Controller {
     }
 
     public void renameRemoteFile(ActionEvent actionEvent) {
-        // еще не дописано переименование файла на сервере
+        if (isFileNotSelected(textFieldServer, "Выберите файл для переименования.")) {
+            return;
+        }
+        oldNameServer = textFieldServer.getText();
+        renamePanelAclive(buttonRenameFileServer, panelRenameFileServer);
+    }
+
+    public void renameServerOk(ActionEvent actionEvent) throws IOException {
+        if (isFileNotSelected(textFieldnewNameServer, "Введите новое имя файла.")) {
+            return;
+        }
+        newNameServer = textFieldnewNameServer.getText();
+        String msgServerRename = oldNameServer + "   " + newNameServer;
+        protoFileSender.sendComand(Comand.RENAME_FILE_FromServer, msgServerRename/*, null*/);
+        renamePanelInAclive(buttonRenameFileServer, panelRenameFileServer);
+        textFieldServer.clear();
+    }
+    public void cancelServer(ActionEvent actionEvent) {
+        renamePanelInAclive(buttonRenameFileServer, panelRenameFileServer);
+        textFieldServer.clear();
     }
 }

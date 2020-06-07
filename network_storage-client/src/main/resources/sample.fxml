@@ -53,7 +53,7 @@
                 <HBox>
                     <TextField fx:id="textFieldnewNameClient" promptText="введите новое имя"/>
                     <Button text="Rename" onAction="#renameClientOk"/>
-                    <Button text="Cansel" onAction="#cancel"/>
+                    <Button text="Cansel" onAction="#cancelClient"/>
                 </HBox>
 
             </VBox>
@@ -69,7 +69,14 @@
             <TextField fx:id="textFieldServer" promptText="Имя файла" editable="false" HBox.hgrow="ALWAYS" />
             <Button alignment="CENTER" maxWidth="Infinity" onAction="#downloadToClient" text="download to client"/>
             <Button alignment="CENTER" maxWidth="Infinity" onAction="#deleteRemoteFile" text="delete remote file" />
-            <Button alignment="CENTER" maxWidth="Infinity" onAction="#renameRemoteFile" text="rename remote file" />
+            <Button fx:id="buttonRenameFileServer" alignment="CENTER" maxWidth="Infinity" onAction="#renameRemoteFile" text="rename remote file" />
+            <VBox fx:id="panelRenameFileServer" HBox.hgrow="ALWAYS" managed="false" visible="false">
+                <HBox>
+                    <TextField fx:id="textFieldnewNameServer" promptText="введите новое имя"/>
+                    <Button text="Rename" onAction="#renameServerOk"/>
+                    <Button text="Cansel" onAction="#cancelServer"/>
+                </HBox>
+            </VBox>
         </VBox>
       <HBox.margin>
          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
