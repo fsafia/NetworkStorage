@@ -12,7 +12,6 @@ import network.storage.common.ProtocolLogPass;
 public class IncomingMessageHandler extends ChannelInboundHandlerAdapter {
     ProtocolFile protocolFile = new ProtocolFile("1client-storage");
     ProtocolComand protocolCom = new ProtocolComand("1client-storage");
-    ProtocolLogPass protocolLogPass = new ProtocolLogPass();
     Controller c;
 
     public enum Response {IDLE, COMAND, FILE}
@@ -69,5 +68,4 @@ public class IncomingMessageHandler extends ChannelInboundHandlerAdapter {
         cause.printStackTrace();
         ctx.close();
     }
-
 }

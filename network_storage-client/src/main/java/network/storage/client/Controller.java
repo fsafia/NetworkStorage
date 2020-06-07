@@ -221,20 +221,12 @@ public class Controller {
         button.setVisible(false);
         renamePanel.setVisible(true);
         renamePanel.setManaged(true);
-//        buttonRenameFileClient.setManaged(false);
-//        buttonRenameFileClient.setVisible(false);
-//        panelRenameFileClient.setVisible(true);
-//        panelRenameFileClient.setManaged(true);
     }
     private void renamePanelInAclive(Button button, VBox renamePanel) {
         button.setManaged(true);
         button.setVisible(true);
         renamePanel.setVisible(false);
         renamePanel.setManaged(false);
-//        buttonRenameFileClient.setManaged(true);
-//        buttonRenameFileClient.setVisible(true);
-//        panelRenameFileClient.setVisible(false);
-//        panelRenameFileClient.setManaged(false);
     }
 
     public void cancelClient(ActionEvent actionEvent) {

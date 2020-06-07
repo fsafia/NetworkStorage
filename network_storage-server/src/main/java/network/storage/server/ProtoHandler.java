@@ -56,8 +56,6 @@ public class ProtoHandler extends ChannelInboundHandlerAdapter {
 
             if (currentRequest == Request.FILE) {
                 protocol.writeFile(ctx, buf, nickName, finishOperation);
-//                ProtoFileSender protoFileSender = new ProtoFileSender(ctx.channel());
-//                protoFileSender.sendServerStorageList(Comand.SERVER_STORAGE_LiST, authHandler.getServerStorageList());
             }
 
             if (currentRequest == Request.COMAND) {

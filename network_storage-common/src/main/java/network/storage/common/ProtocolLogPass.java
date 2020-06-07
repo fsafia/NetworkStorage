@@ -1,22 +1,16 @@
 package network.storage.common;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
 
 public class ProtocolLogPass {
 
     public enum State {IDLE, MSG_LENGHT, MSG_TEXT, NAME, FILE_LENGHT, FILE}
 
-//    public State currentState = State.IDLE;
     public State currentState = State.MSG_LENGHT;
     private int msgLenght;
-    public byte comand;
     public String msgString;
-    public String log;
-    public String pass;
-    public String nick;
 
-    public void executeComand(/*byte cmd, ChannelHandlerContext ctx,*/ ByteBuf buf) throws Exception{
+    public void executeComand( ByteBuf buf) throws Exception{
 
         while (buf.isReadable()) {
             if (currentState == State.MSG_LENGHT) {

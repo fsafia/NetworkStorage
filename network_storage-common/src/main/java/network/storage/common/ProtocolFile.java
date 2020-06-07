@@ -91,7 +91,6 @@ public class ProtocolFile {
         nameLenght = 0;
         fileLenght = 0L;
         receivedFileLenght = 0L;
-        FileOutputStream out = null; //
         newFile = null;
     }
 

@@ -10,19 +10,12 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.CountDownLatch;
 
 public class Network {
-    public Controller c;
     public IncomingMessageHandler incomingMessageHandler;
     private Channel currentChannel;
 
     public Network(Controller c) {
-        this.c = c;
         incomingMessageHandler = new IncomingMessageHandler(c);
     }
-
-
-
-    ChannelHandlerContext ctx;
-
 
     public Channel getCurrentChannel() {
         return currentChannel;
