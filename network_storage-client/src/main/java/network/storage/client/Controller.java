@@ -47,7 +47,7 @@ public class Controller {
         return isAuthorized;
     }
 
-    public void setAuthorized(boolean isAuthorized){
+    public void setAuthorized(boolean isAuthorized, Network network){
         this.isAuthorized = isAuthorized;
         if(!isAuthorized){
             authPanel.setVisible(true);
@@ -75,6 +75,9 @@ public class Controller {
                     textFieldServer.setText(serverStorage.getSelectionModel().getSelectedItem());
                 }
             });
+            network.setReceivedCallback(() -> {
+                updateLocalStorage();
+            });
         }
     }
 
@@ -85,8 +88,8 @@ public class Controller {
             network.start(networkStarter);
         }).start();
         networkStarter.await();
-        channel = network.getCurrentChannel();
-        protoFileSender = new ProtoFileSender(channel);
+//        channel = network.getCurrentChannel();
+        protoFileSender = network.protoFileSender;
     }
 
 
@@ -146,19 +149,24 @@ public class Controller {
 
     public void authResponse(byte comand, String response) throws IOException {
         if (comand == Comand.AUTH_OK) {
-            setAuthorized(true);
+            setAuthorized(true, network);
             updateLocalStorage();
         }
         if (comand == Comand.AUTH_NOT_OK) {
             Platform.runLater(() -> {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Подключиться не удалось!");
-                alert.setHeaderText(null);// Header Text: null
-                alert.setContentText(response);
+//                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+//                alert.setTitle("Подключиться не удалось!");
+//                alert.setHeaderText(null);// Header Text: null
+//                alert.setContentText(response);
+//                alert.showAndWait();
+
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, response, ButtonType.OK);
+                alert.setHeaderText(null);
                 alert.showAndWait();
             });
         }
     }
+
     public void updateServerStorage(String fileList) {
         String[] files = fileList.split("   ");
         Platform.runLater(() -> {
@@ -168,6 +176,7 @@ public class Controller {
             }
         });
     }
+
     public void updateLocalStorage() {
         List<String> fileList = null;
         try {
@@ -204,6 +213,7 @@ public class Controller {
         updateLocalStorage();
         renamePanelInAclive(buttonRenameFileClient, panelRenameFileClient);
         textFieldClient.clear();
+        textFieldnewNameClient.clear();
     }
 
     private boolean isFileNotSelected(TextField textField, String info) {
@@ -234,11 +244,16 @@ public class Controller {
         textFieldClient.clear();
     }
 
-    public void Dispose(){
+    public void Dispose() {
         System.out.println("Отправляем сообщение на сервер о завершении работы");
-        if(channel != null ){
-            protoFileSender.sendClose(Comand.CLIENT_CLOSE);
+        try {
+            if(channel != null ){
+                protoFileSender.sendComand(Comand.CLIENT_CLOSE, "close");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
     }
 
     public void renameRemoteFile(ActionEvent actionEvent) {
@@ -263,4 +278,5 @@ public class Controller {
         renamePanelInAclive(buttonRenameFileServer, panelRenameFileServer);
         textFieldServer.clear();
     }
+
 }

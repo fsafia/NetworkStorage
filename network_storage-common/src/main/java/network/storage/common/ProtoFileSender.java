@@ -14,9 +14,12 @@ import java.util.List;
 import static network.storage.common.Comand.WRITE_FILE;
 
 public class ProtoFileSender {
-
     private  Channel channel;
-    public ProtoFileSender(Channel channel) {
+
+    public Channel getChannel() {
+        return channel;
+    }
+    public void setChannel(Channel channel) {
         this.channel = channel;
     }
 
@@ -29,20 +32,20 @@ public class ProtoFileSender {
         channel.writeAndFlush(buf);
     }
 
-    public void sendServerStorageList(byte comand, List<String> serverStorageList) {
-        if (serverStorageList == null) {
-            return;
-        }
-        try {
-            StringBuffer sb = new StringBuffer();
-            for (String file : serverStorageList ) {
-                sb = sb.append(file + "   ");
-            }
-            sendComand(comand, sb.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    //    public void sendServerStorageList(byte comand, List<String> serverStorageList) { //можно зашить конкретную команду
+//        if (serverStorageList == null) {
+//            return;
+//        }
+//        try {
+//            StringBuffer sb = new StringBuffer();
+//            for (String file : serverStorageList ) {
+//                sb = sb.append(file + "   ");
+//            }
+//            sendComand(comand, sb.toString());
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
     public void sendClose(byte comand) {
         ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1);
         buf.writeByte(comand);
