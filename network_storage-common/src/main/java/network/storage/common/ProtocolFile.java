@@ -97,15 +97,6 @@ public class ProtocolFile {
         Path path = Paths.get(fn); // получили Path  в виде network_storage-client/1.txt
         path = path.getFileName(); //получили Path  имя файла 1.txt
         return  Paths.get(storage,nick, path.toString());
-
-//        Path serverPath;
-//        return (nick == null)? Paths.get(storage, path.toString()): Paths.get(storage,nick, path.toString());
-//        if (nick == null) {
-//            serverPath = Paths.get(storage, path.toString());
-//        } else {
-//            serverPath = Paths.get(storage,nick, path.toString());
-//        }
-//        return serverPath;
     }
 
     private void resetState() {

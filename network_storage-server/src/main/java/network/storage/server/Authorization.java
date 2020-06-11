@@ -60,8 +60,6 @@ public class Authorization {
                     nick = null;
                 } else {
                     protoFileSender.sendComand(Comand.AUTH_OK, nick);    //отправить ответ клиенту авторизован
-//                    protoFileSender.sendServerStorageList(Comand.SERVER_STORAGE_LiST, getServerStorageList("1server-storage"));
-//                    sendServerStorageList(protoFileSender, Paths.get(storage, authHandler.nick));
                     rezult = true;
                 }
             } else {

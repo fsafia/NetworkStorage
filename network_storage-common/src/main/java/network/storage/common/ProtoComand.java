@@ -13,7 +13,6 @@ public abstract class ProtoComand {
     private int msgLenght;
     private byte comand;
     public String msgString;
-    //    public String storage;
     private ByteBuf buffer;
     private int receivedLength;
     public String nick;

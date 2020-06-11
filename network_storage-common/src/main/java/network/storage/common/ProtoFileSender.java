@@ -34,11 +34,7 @@ public class ProtoFileSender {
         buf.writeBytes(filenameBytes);
         channel.writeAndFlush(buf);
     }
-//    public void sendClose(byte comand) {
-//        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1);
-//        buf.writeByte(comand);
-//        channel.writeAndFlush(buf);
-//    }
+
     public void sendFile(Path storagePath, ChannelFutureListener finishListener) throws IOException {
         FileRegion region = new DefaultFileRegion(storagePath.toFile(), 0, Files.size(storagePath));
         byte[] fileNameBytes = storagePath.getFileName().toString().getBytes(StandardCharsets.UTF_8);

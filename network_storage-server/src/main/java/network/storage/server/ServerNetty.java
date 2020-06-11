@@ -13,7 +13,6 @@ public class ServerNetty {
     public void run()  throws Exception {
         EventLoopGroup bossGroup = new NioEventLoopGroup();     // Пул потоков для обработки подключений клиентов
         EventLoopGroup workerGroup = new NioEventLoopGroup();   // пул потоков для обработки сетевых подключений
-//        ProtoFileSender protoFileSender = new ProtoFileSender();
         ProtoComandServer protoComandServer = new ProtoComandServer("1server-storage");
         ProtoHandler protoHandler = new ProtoHandler("1server-storage", protoComandServer);
         protoHandler.setOnReceivedCallback(() -> {

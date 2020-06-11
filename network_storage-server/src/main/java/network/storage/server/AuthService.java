@@ -43,7 +43,6 @@ public class AuthService {
                 if (myHash == dbHash) {
                     return nick;
                 }
-                //return  rs.getString(1); //при работе с jdbc индексация начин с 1
             }
         } catch (SQLException e) {
             e.printStackTrace();

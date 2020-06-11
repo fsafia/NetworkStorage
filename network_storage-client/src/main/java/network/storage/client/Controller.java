@@ -154,12 +154,6 @@ public class Controller {
         }
         if (comand == Comand.AUTH_NOT_OK) {
             Platform.runLater(() -> {
-//                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-//                alert.setTitle("Подключиться не удалось!");
-//                alert.setHeaderText(null);// Header Text: null
-//                alert.setContentText(response);
-//                alert.showAndWait();
-
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, response, ButtonType.OK);
                 alert.setHeaderText(null);
                 alert.showAndWait();
