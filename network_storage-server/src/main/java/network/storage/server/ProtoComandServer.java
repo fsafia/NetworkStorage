@@ -1,5 +1,6 @@
 package network.storage.server;
 
+import io.netty.channel.ChannelHandlerContext;
 import network.storage.common.Comand;
 import network.storage.common.ProtoComand;
 import network.storage.common.ProtoFileSender;
@@ -13,16 +14,14 @@ import java.util.stream.Collectors;
 
 public class ProtoComandServer extends ProtoComand {
     ProtoFileSender protoFileSender;
+    public String storage;
 
     public ProtoComandServer(String storage) {
         this.storage = storage;
     }
 
-    public String storage;
-//    String nick;
-
     @Override
-    public void executСomand(ProtoFileSender protoFileSender, byte comand, String msgString) {
+    public void executСomand(ProtoFileSender protoFileSender, byte comand, String msgString, ChannelHandlerContext ctx) {
         this.protoFileSender = protoFileSender;
         if (comand == Comand.TRY_TO_SIGNUP || comand == Comand.TRY_TO_AUTH) {
             Authorization authorization = new Authorization(protoFileSender, comand, msgString, storage);
@@ -31,7 +30,6 @@ public class ProtoComandServer extends ProtoComand {
         }
         switch (comand) {
             case Comand.TRY_TO_AUTH:
-//                String n = nick;
                 if (nick != null) { //авторизация прошла успешно
                     sendServerStorageList();
                 }
@@ -41,6 +39,7 @@ public class ProtoComandServer extends ProtoComand {
                     AuthService.getUserList().remove(nick);
                 }
                 protoFileSender.getChannel().close();
+                ctx.close();
                 return;
 
             case Comand.DELETE_FILE_FromServer:
@@ -79,25 +78,13 @@ public class ProtoComandServer extends ProtoComand {
 
 
     public void sendServerStorageList() {
-//        if (!Files.exists(Paths.get(storage,nick))) {// если еще нет каталога с nick
-//            return;
-//        }
         try {
-            List<String> fileList = null;
-            fileList = Files.list(Paths.get(storage, nick))
+            String serverStorageList = Files.list(Paths.get(storage, nick))
                     .filter(p -> !Files.isDirectory(p))
                     .map(p -> p.getFileName().toString())
-                    .collect(Collectors.toList());
-            StringBuffer sb = new StringBuffer();
-            for (String file : fileList ) {
-                sb = sb.append(file + "   ");
-            }
-//            String serverStorageList = Files.list(Paths.get(storage, nick))
-//                    .filter(p -> !Files.isDirectory(p))
-//                    .map(p -> p.getFileName().toString())
-//                    .collect(Collectors.joining("   ", "", ""));
+                    .collect(Collectors.joining("   ", "", ""));
 
-            protoFileSender.sendComand(Comand.SERVER_STORAGE_LiST, sb.toString());
+            protoFileSender.sendComand(Comand.SERVER_STORAGE_LiST, serverStorageList);
         } catch (IOException e) {
             e.printStackTrace();
         }

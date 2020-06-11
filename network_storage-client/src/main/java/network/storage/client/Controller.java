@@ -88,7 +88,7 @@ public class Controller {
             network.start(networkStarter);
         }).start();
         networkStarter.await();
-//        channel = network.getCurrentChannel();
+        channel = network.getCurrentChannel();
         protoFileSender = network.protoFileSender;
     }
 
@@ -168,13 +168,20 @@ public class Controller {
     }
 
     public void updateServerStorage(String fileList) {
-        String[] files = fileList.split("   ");
-        Platform.runLater(() -> {
-            serverStorage.getItems().clear();
-            for (int i = 0; i < files.length; i++) {
-                serverStorage.getItems().add(files[i]);
-            }
-        });
+        if (fileList.equals("empty")) {
+            Platform.runLater(() -> {
+                serverStorage.getItems().clear();
+            });
+        } else {String[] files = fileList.split("   ");
+            Platform.runLater(() -> {
+                serverStorage.getItems().clear();
+                for (int i = 0; i < files.length; i++) {
+                    serverStorage.getItems().add(files[i]);
+                }
+            });
+        }
+
+
     }
 
     public void updateLocalStorage() {
@@ -273,6 +280,7 @@ public class Controller {
         protoFileSender.sendComand(Comand.RENAME_FILE_FromServer, msgServerRename/*, null*/);
         renamePanelInAclive(buttonRenameFileServer, panelRenameFileServer);
         textFieldServer.clear();
+        textFieldnewNameServer.clear();
     }
     public void cancelServer(ActionEvent actionEvent) {
         renamePanelInAclive(buttonRenameFileServer, panelRenameFileServer);

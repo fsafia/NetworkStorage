@@ -25,7 +25,7 @@ public abstract class ProtoComand {
         this.comand = comand;
     }
 
-    public void receiveMsg(ProtoFileSender protoFileSender, ByteBuf buf, Runnable finishOperation) throws Exception {
+    public void receiveMsg(ProtoFileSender protoFileSender, ByteBuf buf, Runnable finishOperation, ChannelHandlerContext ctx) throws Exception {
 
         if (currentState == State.MSG_LENGHT) {
             if (buf.readableBytes() >= 4) {  // считывает int
@@ -41,7 +41,7 @@ public abstract class ProtoComand {
                 receivedLength++;
                 if (receivedLength == msgLenght) {
                     msgString = buffer.toString(StandardCharsets.UTF_8);
-                    executСomand(protoFileSender, comand, msgString);
+                    executСomand(protoFileSender, comand, msgString, ctx);
                     finishOperation.run();
                     currentState = State.IDLE;
                     buffer.clear();
@@ -52,6 +52,6 @@ public abstract class ProtoComand {
         }
     }
 
-    public abstract void executСomand(ProtoFileSender protoFileSender, byte cmd, String msgString) ;
+    public abstract void executСomand(ProtoFileSender protoFileSender, byte cmd, String msgString, ChannelHandlerContext ctx) ;
 
 }

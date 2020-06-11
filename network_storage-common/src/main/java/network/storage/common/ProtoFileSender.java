@@ -24,6 +24,9 @@ public class ProtoFileSender {
     }
 
     public void sendComand(byte comand, String str) throws IOException {
+        if (str.equals("")) {
+            str = "empty";
+        }
         byte[] filenameBytes = str.getBytes(StandardCharsets.UTF_8);
         ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1 + 4 + filenameBytes.length );
         buf.writeByte(comand);
@@ -31,26 +34,11 @@ public class ProtoFileSender {
         buf.writeBytes(filenameBytes);
         channel.writeAndFlush(buf);
     }
-
-    //    public void sendServerStorageList(byte comand, List<String> serverStorageList) { //можно зашить конкретную команду
-//        if (serverStorageList == null) {
-//            return;
-//        }
-//        try {
-//            StringBuffer sb = new StringBuffer();
-//            for (String file : serverStorageList ) {
-//                sb = sb.append(file + "   ");
-//            }
-//            sendComand(comand, sb.toString());
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+//    public void sendClose(byte comand) {
+//        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1);
+//        buf.writeByte(comand);
+//        channel.writeAndFlush(buf);
 //    }
-    public void sendClose(byte comand) {
-        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1);
-        buf.writeByte(comand);
-        channel.writeAndFlush(buf);
-    }
     public void sendFile(Path storagePath, ChannelFutureListener finishListener) throws IOException {
         FileRegion region = new DefaultFileRegion(storagePath.toFile(), 0, Files.size(storagePath));
         byte[] fileNameBytes = storagePath.getFileName().toString().getBytes(StandardCharsets.UTF_8);

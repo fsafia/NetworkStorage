@@ -15,9 +15,6 @@ import java.util.concurrent.CountDownLatch;
 public class Network {
 
     public ProtoFileSender protoFileSender;
-    //    public Controller c;
-//    public IncomingMessageHandler incomingMessageHandler;
-//    public ProtoAuthComandClient protoAuthComandClient;
     public ProtoComandClient protoComandClient;
     private Channel currentChannel;
 
@@ -45,7 +42,7 @@ public class Network {
             b.remoteAddress(new InetSocketAddress("localhost", 8189));
             b.handler(new ChannelInitializer<SocketChannel>() {
                 public void initChannel(SocketChannel socketChannel) throws Exception {
-                    socketChannel.pipeline().addLast(new ProtoHandler("1client-storage", protoFileSender, protoComandClient));
+                    socketChannel.pipeline().addLast(new ProtoHandler("1client-storage", protoComandClient));
                     protoFileSender.setChannel(socketChannel);
                     currentChannel = socketChannel;
                 }
